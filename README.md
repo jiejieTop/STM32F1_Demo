@@ -5,15 +5,22 @@
 > 
 **我是杰杰，请多指教**
 
-STM32F1_DEMO是一个基于野火stm32霸道开发版做的所有工程demo，在这里我们可以选择适合自己项目需要的bsp example，
+STM32F1_DEMO是一个基于野火stm32霸道开发版做的所有工程demo，在这里可以选择适合自己项目需要的bsp移植到工程中。
 
-目前bsp包括：
+STM32F1_DEMO is a project demo based on the EmbedFire stm32Ba Dao development version. In Here you can choose the bsp that is suitable for your project needs to be transplanted into the project.
+
+目前打算完善的bsp包括：
+
+The bsp currently intended to be perfect includes:
 
 1. led
 2. key
 3. exti
 4. usart
 5. usart+dma
+
+---
+
 6. rtc
 7. dma(mem 2 mem)
 8. i2c
