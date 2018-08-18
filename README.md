@@ -18,10 +18,8 @@ The bsp currently intended to be perfect includes:
 3. exti
 4. usart
 5. usart+dma
-
+6. SysTick
 ---
-
-6. rtc
 7. dma(mem 2 mem)
 8. i2c
 9. spi
