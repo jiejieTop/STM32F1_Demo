@@ -25,7 +25,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f10x_it.h"
-
+#include "bsp_usart.h"
 
 /** @addtogroup STM32F10x_StdPeriph_Template
   * @{
@@ -139,7 +139,28 @@ void SysTick_Handler(void)
 {
 }
 
-
+// 串口中断服务函数
+void DEBUG_USART_IRQHandler(void)
+{
+#if USE_USART_DMA_RX
+	/* 使用串口DMA */
+	if(USART_GetITStatus(DEBUG_USARTx,USART_IT_IDLE)!=RESET)
+	{		
+		/* 处理数据 */
+		Uart_DMA_Rx_Data();
+		// 清除空闲中断标志位
+		USART_ReceiveData( DEBUG_USARTx );
+	}	
+#else
+	/* 不使用串口DMA */
+	uint8_t ucTemp;
+	if(USART_GetITStatus(DEBUG_USARTx,USART_IT_RXNE)!=RESET)
+	{		
+		ucTemp = USART_ReceiveData(DEBUG_USARTx);
+		USART_SendData(DEBUG_USARTx,ucTemp);    
+	}
+#endif
+}
 
 /**
   * @brief  This function handles PPP interrupt request.
