@@ -15,9 +15,20 @@
   ******************************************************************************
   */ 
 	
-#include "bsp_usart.h"
-/* FreeRTOS头文件 */
+/* usart头文件 */
+#include "./usart/bsp_usart.h"
 
+
+
+/**
+  ******************************************************************
+														函数声明
+  ******************************************************************
+  */ 
+#if USE_USART_DMA_RX
+static void USARTx_DMA_Config(void);
+#endif
+static void NVIC_Configuration(void);
  /**
   * @brief  配置嵌套向量中断控制器NVIC
   * @param  无
@@ -93,6 +104,8 @@ void USART_Config(void)
 	USART_ITConfig(DEBUG_USARTx, USART_IT_IDLE, ENABLE);  
   // 开启串口DMA接收
 	USART_DMACmd(DEBUG_USARTx, USART_DMAReq_Rx, ENABLE); 
+	/* 使能串口DMA */
+	USARTx_DMA_Config();
 #else
 	// 使能串口接收中断
 	USART_ITConfig(DEBUG_USARTx, USART_IT_RXNE, ENABLE);	
@@ -106,7 +119,7 @@ void USART_Config(void)
 
 char Usart_Rx_Buf[USART_RBUFF_SIZE];
 
-void USARTx_DMA_Config(void)
+static void USARTx_DMA_Config(void)
 {
 	DMA_InitTypeDef DMA_InitStructure;
 
@@ -148,18 +161,26 @@ void USARTx_DMA_Config(void)
 
 void Uart_DMA_Rx_Data(void)
 {
-	// 关闭DMA ，防止干扰
+	/* 接收的数据长度 */
+	uint32_t buff_length;
+	
+	/* 关闭DMA ，防止干扰 */
 	DMA_Cmd(USART_RX_DMA_CHANNEL, DISABLE);  
 	
-	// 清DMA标志位
+	/* 获取接收到的数据长度 单位为字节*/
+	buff_length = USART_RBUFF_SIZE - DMA_GetCurrDataCounter(USART_RX_DMA_CHANNEL);
+	
+	printf("buff_length = %d 字节\n ",buff_length);
+	
+	/* 清DMA标志位 */
 	DMA_ClearFlag( DMA1_FLAG_TC5 );          
 	
-	//  重新赋值计数值，必须大于等于最大可能接收到的数据帧数目
+	/* 重新赋值计数值，必须大于等于最大可能接收到的数据帧数目 */
 	USART_RX_DMA_CHANNEL->CNDTR = USART_RBUFF_SIZE;    
 	
 	DMA_Cmd(USART_RX_DMA_CHANNEL, ENABLE);       
 	
-	//给出信号 ，发送接收到新数据标志，供前台程序查询
+	/* 给出信号 ，发送接收到新数据标志，供前台程序查询 */
 	
 	/* 
 	DMA 开启，等待数据。注意，如果中断发送数据帧的速率很快，MCU来不及处理此次接收到的数据，
@@ -253,5 +274,36 @@ int fgetc(FILE *f)
 		while (USART_GetFlagStatus(DEBUG_USARTx, USART_FLAG_RXNE) == RESET);
 
 		return (int)USART_ReceiveData(DEBUG_USARTx);
+}
+
+/**
+  ******************************************************************
+  * @brief   串口中断服务函数
+  * @author  jiejie
+  * @version V1.0
+  * @date    2018-xx-xx
+  ******************************************************************
+  */ 
+void DEBUG_USART_IRQHandler(void)
+{
+#if USE_USART_DMA_RX
+	/* 使用串口DMA */
+	if(USART_GetITStatus(DEBUG_USARTx,USART_IT_IDLE)!=RESET)
+	{		
+		/* 处理数据 */
+		Uart_DMA_Rx_Data();
+		// 清除空闲中断标志位
+		USART_ReceiveData( DEBUG_USARTx );
+	}	
+#else
+	/* 不使用串口DMA */
+	uint8_t ucTemp;
+	if(USART_GetITStatus(DEBUG_USARTx,USART_IT_RXNE)!=RESET)
+	{		
+		ucTemp = USART_ReceiveData(DEBUG_USARTx);
+		printf("%c",ucTemp);
+//		USART_SendData(DEBUG_USARTx,ucTemp);    
+	}
+#endif
 }
 

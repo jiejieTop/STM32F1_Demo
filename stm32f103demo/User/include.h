@@ -9,6 +9,7 @@
 /* c 标准库 */
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
 
 /* 板级头文件 */
 #include "./exti/bsp_exti.h"
@@ -18,6 +19,8 @@
 #include "./led/bsp_led.h" 
 
 #include "./usart/bsp_usart.h"
+/* include 数据打包文件 */
+#include "./usart/data_pack.h"
 
 #include "./SysTick/bsp_SysTick.h"
 

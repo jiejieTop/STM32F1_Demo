@@ -11,7 +11,7 @@
 	* 2-修改GPIO的宏
   */
 /* 使用串口DMA接收 */
-#define  USE_USART_DMA_RX  1
+#define  USE_USART_DMA_RX  0
 
 #if USE_USART_DMA_RX
 // 串口对应的DMA请求通道
@@ -117,10 +117,12 @@
 
 
 void USART_Config(void);
+
 #if USE_USART_DMA_RX
-void USARTx_DMA_Config(void);
+//void USARTx_DMA_Config(void);
 void Uart_DMA_Rx_Data(void);
 #endif
+
 void Usart_SendByte( USART_TypeDef * pUSARTx, uint8_t ch);
 void Usart_SendString( USART_TypeDef * pUSARTx, char *str);
 void Usart_SendHalfWord( USART_TypeDef * pUSARTx, uint16_t ch);

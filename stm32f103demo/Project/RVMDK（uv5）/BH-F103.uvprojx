@@ -586,6 +586,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\User\bsp\led\bsp_led.c</FilePath>
             </File>
+            <File>
+              <FileName>data_pack.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\bsp\usart\data_pack.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

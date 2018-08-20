@@ -44,10 +44,12 @@ static void BSP_Init(void);
 int main(void)
 {
 	BSP_Init();
+	char jie[] = "abcd";
 	while(1)                            
 	{
-		printf("welcome to learn jiejie stm32 library!\n");
-		Delay_ms(500);
+		Create_Pack(&jie);
+//		printf("welcome to learn jiejie stm32 library!\n");
+		Delay_ms(5000);
 	}
 }
 
@@ -74,7 +76,7 @@ static void BSP_Init(void)
 	EXTI_Key_Config(); 
 	
 	/* ¥Ú”°–≈œ¢ */
-	printf("welcome to learn jiejie stm32 library!\n");
+//	printf("welcome to learn jiejie stm32 library!\n");
 	
 }
 
