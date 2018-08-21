@@ -44,7 +44,6 @@ static void BSP_Init(void);
 int main(void)
 {
 	char jie[] = "123456789";
-	int i;
 	BSP_Init();
 
 	while(1)                            

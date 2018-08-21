@@ -22,6 +22,8 @@
 /* include 数据打包文件 */
 #include "./usart/data_pack.h"
 
+#include "./crc/bsp_crc.h"
+
 #include "./SysTick/bsp_SysTick.h"
 
 

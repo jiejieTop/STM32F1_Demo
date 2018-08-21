@@ -170,7 +170,7 @@ void Uart_DMA_Rx_Data(void)
 	/* 获取接收到的数据长度 单位为字节*/
 	buff_length = USART_RX_BUFF_SIZE - DMA_GetCurrDataCounter(USART_RX_DMA_CHANNEL);
 	
-	printf("buff_length = %d 字节\n ",buff_length);
+	printf("buff_length = %d\n ",buff_length);
 	
 	/* 清DMA标志位 */
 	DMA_ClearFlag( DMA1_FLAG_TC5 );          
