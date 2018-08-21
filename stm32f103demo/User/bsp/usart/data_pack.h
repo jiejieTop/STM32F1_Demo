@@ -14,8 +14,15 @@
 													   ∫Í∂®“Â
   ******************************************************************
   */ 
-#define NAME_HEAD   "cai"
-#define NAME_TAIL   "jie"
+#define NAME_HEAD1   'x'
+#define NAME_HEAD2   'c'
+#define NAME_HEAD3   'a'
+#define NAME_HEAD4   'i'
+
+#define NAME_TAIL1   'x'
+#define NAME_TAIL2   'j'
+#define NAME_TAIL3   'i'
+#define NAME_TAIL4   'e'
 
 #define DATA_HEAD   Get_Data_Head()
 #define DATA_TAIL   Get_Data_Tail()
@@ -45,7 +52,7 @@ typedef struct datapack
   ******************************************************************
   */ 
 
-void Create_Pack(void *buff);
+void Create_Pack(void *buff,uint32_t len);
 
 uint32_t Get_Data_Head(void);
 uint32_t Get_Data_Tail(void);

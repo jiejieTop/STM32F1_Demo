@@ -43,11 +43,13 @@ static void BSP_Init(void);
   */ 
 int main(void)
 {
+	char jie[] = "123456789";
+	int i;
 	BSP_Init();
-	char jie[] = "abcd";
+
 	while(1)                            
 	{
-		Create_Pack(&jie);
+		Create_Pack(&jie,strlen(jie));
 //		printf("welcome to learn jiejie stm32 library!\n");
 		Delay_ms(5000);
 	}

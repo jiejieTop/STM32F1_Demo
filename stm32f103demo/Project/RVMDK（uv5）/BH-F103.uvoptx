@@ -152,9 +152,9 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>45</LineNumber>
+          <LineNumber>52</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134222424</Address>
+          <Address>134223040</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -163,71 +163,7 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>G:\jiejieTop\STM32F1_Demo\stm32f103demo\Project\User\bsp\usart\data_pack.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\STM32_Demo\../../User/bsp/usart/data_pack.c\45</Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>46</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134222430</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>G:\jiejieTop\STM32F1_Demo\stm32f103demo\Project\User\bsp\usart\data_pack.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\STM32_Demo\../../User/bsp/usart/data_pack.c\46</Expression>
-        </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
-          <LineNumber>47</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134222434</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>G:\jiejieTop\STM32F1_Demo\stm32f103demo\Project\User\bsp\usart\data_pack.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\STM32_Demo\../../User/bsp/usart/data_pack.c\47</Expression>
-        </Bp>
-        <Bp>
-          <Number>3</Number>
-          <Type>0</Type>
-          <LineNumber>48</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134222438</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>G:\jiejieTop\STM32F1_Demo\stm32f103demo\Project\User\bsp\usart\data_pack.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\STM32_Demo\../../User/bsp/usart/data_pack.c\48</Expression>
-        </Bp>
-        <Bp>
-          <Number>4</Number>
-          <Type>0</Type>
-          <LineNumber>51</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134222444</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>G:\jiejieTop\STM32F1_Demo\stm32f103demo\Project\User\bsp\usart\data_pack.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\STM32_Demo\../../User/bsp/usart/data_pack.c\51</Expression>
+          <Expression>\\STM32_Demo\../../User/bsp/usart/data_pack.c\52</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -235,6 +171,21 @@
           <count>0</count>
           <WinNumber>1</WinNumber>
           <ItemText>Usart_Rx_Buf</ItemText>
+        </Ww>
+        <Ww>
+          <count>1</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>pTxBuf</ItemText>
+        </Ww>
+        <Ww>
+          <count>2</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>copy_buff[USART_RX_BUFF_SIZE]</ItemText>
+        </Ww>
+        <Ww>
+          <count>3</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>copy_buff</ItemText>
         </Ww>
       </WatchWindow1>
       <Tracepoint>

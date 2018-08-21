@@ -117,7 +117,7 @@ void USART_Config(void)
 
 #if USE_USART_DMA_RX 
 
-char Usart_Rx_Buf[USART_RBUFF_SIZE];
+char Usart_Rx_Buf[USART_RX_BUFF_SIZE];
 
 static void USARTx_DMA_Config(void)
 {
@@ -132,7 +132,7 @@ static void USARTx_DMA_Config(void)
 	// 方向：从内存到外设	
 	DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralSRC;
 	// 传输大小	
-	DMA_InitStructure.DMA_BufferSize = USART_RBUFF_SIZE;
+	DMA_InitStructure.DMA_BufferSize = USART_RX_BUFF_SIZE;
 	// 外设地址不增	    
 	DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
 	// 内存地址自增
@@ -168,7 +168,7 @@ void Uart_DMA_Rx_Data(void)
 	DMA_Cmd(USART_RX_DMA_CHANNEL, DISABLE);  
 	
 	/* 获取接收到的数据长度 单位为字节*/
-	buff_length = USART_RBUFF_SIZE - DMA_GetCurrDataCounter(USART_RX_DMA_CHANNEL);
+	buff_length = USART_RX_BUFF_SIZE - DMA_GetCurrDataCounter(USART_RX_DMA_CHANNEL);
 	
 	printf("buff_length = %d 字节\n ",buff_length);
 	
@@ -176,7 +176,7 @@ void Uart_DMA_Rx_Data(void)
 	DMA_ClearFlag( DMA1_FLAG_TC5 );          
 	
 	/* 重新赋值计数值，必须大于等于最大可能接收到的数据帧数目 */
-	USART_RX_DMA_CHANNEL->CNDTR = USART_RBUFF_SIZE;    
+	USART_RX_DMA_CHANNEL->CNDTR = USART_RX_BUFF_SIZE;    
 	
 	DMA_Cmd(USART_RX_DMA_CHANNEL, ENABLE);       
 	

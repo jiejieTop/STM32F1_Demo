@@ -1,5 +1,6 @@
 /* 头文件 */
-#include "./usart/data_pack.h"
+
+#include "include.h"
 
 /**
   ******************************************************************
@@ -13,8 +14,10 @@
 	* --------------------------------------------------------------------------
 	* | cai(0x636169) |    length    |    buff     |   校验   |  jie(0x6a6965) |
 	* --------------------------------------------------------------------------
-	*      
-	* 
+	* |     uint32    |     uint32   |    buff     |  uint32  |     uint32     |
+	* -------------------------------------------------------------------------- 
+	* |     4字节     |     4字节    |    buff     |   4字节  |     4字节      |
+	* -------------------------------------------------------------------------- 
 	* 
 	* 
 	* 
@@ -37,36 +40,58 @@ void Read_Ack(DataPack *p,u8 len);
   * @return  新的数据包地址
   ******************************************************************
   */ 
-void Create_Pack(void *buff)
+void Create_Pack(void *buff,uint32_t len)
 {
-	DataPack data_pack;
-	DataPack  *send_data=&data_pack;  
+//	DataPack data_pack;
 	
-	data_pack.data_head = DATA_HEAD; 
-	data_pack.data_length = 50;
-	data_pack.data = "faklfasd";
-	data_pack.data_tail = DATA_TAIL;
-	
-//	USART_Send((u8*)&T,sizeof(T));
-	Read_Ack(send_data,50);
-//	printf("%s",(u8 *)&data_pack);
+//#if USE_USART_DMA_TX
 //	
+	uint8_t copy_buff[USART_RX_BUFF_SIZE];
+	
+	uint8_t *pTxBuf = copy_buff;
+	
+	*pTxBuf ++= NAME_HEAD1; 
+	*pTxBuf ++= NAME_HEAD2; 
+	*pTxBuf ++= NAME_HEAD3; 
+	*pTxBuf ++= NAME_HEAD4; 
+
+	memcpy(copy_buff + 8 , buff , len);
+	pTxBuf = (copy_buff + 8 + len);
+	
+	
+	
+	*pTxBuf ++= NAME_TAIL1; 
+	*pTxBuf ++= NAME_TAIL2; 
+	*pTxBuf ++= NAME_TAIL3; 
+	*pTxBuf ++= NAME_TAIL4; 
+	
+	
+//	data_pack.data = &copy_buff;
+	
+	printf("%s",copy_buff);
+//#else
+//	data_pack.data_head = DATA_HEAD; 
+//	data_pack.data_length = len;
+//	data_pack.data = buff;
+//	
+//	data_pack.data_tail = DATA_TAIL;
+//#endif	
+	
+
+	
+	
+#if USE_USART_DMA_TX
+	
+#else
+	
+	printf("%x",(uint32_t) data_pack.data_head);
+	printf("%d",data_pack.data_length);
+	printf("%s",(char *) data_pack.data);
+	printf("%x",(uint32_t) data_pack.data_tail);
+	
+#endif	
 }
 
-void Read_Ack(DataPack *p,u8 len)     //形参1为结构体的首地址 &read_back   形参2 为发送帧的长度
-{
-         static u8 date,i;	   
-	 for(i=0;i<len;i++)
-	{
-	 date= * (((u8*) &p->data_head)+i);    //每次循环将指针指向结构体中的下一个数据
-         USART_SendData(USART1,date);   //通过串口3发送数据
-         while( USART_GetFlagStatus(USART1,USART_FLAG_TC)!= SET); //等待发送完成
-         }
-}
-
-
-char Name_Head[] = NAME_HEAD;
-char Name_Tail[] = NAME_TAIL;
 /**
   ******************************************************************
   * @brief   获取数据包起始帧(最大是4字节)，目前配置为3字节，按需修改即可
@@ -77,7 +102,8 @@ char Name_Tail[] = NAME_TAIL;
   */ 
 uint32_t Get_Data_Head(void)
 {
-	return  (uint32_t)(Name_Head[0] << 16) | (Name_Head[1] << 8) | Name_Head[2];
+	return  (uint32_t)(NAME_TAIL1 << 24) | (NAME_TAIL2 << 16) | \
+										(NAME_TAIL3 << 8) | (NAME_TAIL4);
 }
 
 /**
@@ -90,7 +116,8 @@ uint32_t Get_Data_Head(void)
   */ 
 uint32_t Get_Data_Tail(void)
 {
-	return  (uint32_t)(Name_Tail[0] << 16) | (Name_Tail[1] << 8) | Name_Tail[2];
+	return  (uint32_t)(NAME_HEAD1 << 24) | (NAME_HEAD2 << 16) | \
+										(NAME_HEAD3 << 8) | (NAME_HEAD4);
 }
 
 

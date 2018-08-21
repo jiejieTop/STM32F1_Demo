@@ -11,7 +11,7 @@
 	* 2-修改GPIO的宏
   */
 /* 使用串口DMA接收 */
-#define  USE_USART_DMA_RX  0
+#define  USE_USART_DMA_RX  1
 
 #if USE_USART_DMA_RX
 // 串口对应的DMA请求通道
@@ -19,9 +19,20 @@
 // 外设寄存器地址
 #define  USART_DR_ADDRESS        (&DEBUG_USARTx->DR)
 // 一次发送的数据量
-#define  USART_RBUFF_SIZE            1000 
+#define  USART_RX_BUFF_SIZE            1000 
 #endif
 
+/* 使用串口DMA发送 */
+#define  USE_USART_DMA_TX  1
+
+#if USE_USART_DMA_TX
+// 串口对应的DMA请求通道
+#define  USART_TX_DMA_CHANNEL     DMA1_Channel4
+// 外设寄存器地址
+#define  USART_DR_ADDRESS        (&DEBUG_USARTx->DR)
+// 一次发送的数据量
+#define  USART_TX_BUFF_SIZE            1000 
+#endif
 	
 // 串口1-USART1
 #define  DEBUG_USARTx                   USART1
