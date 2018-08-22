@@ -32,7 +32,6 @@ static void BSP_Init(void);
   */ 
 	
 	
-	
 /**
   ******************************************************************
   * @brief   主函数
@@ -43,13 +42,15 @@ static void BSP_Init(void);
   */ 
 int main(void)
 {
-	char jie[] = "123456789";
+	char jie[] = "123456hbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb789";
+	
 	BSP_Init();
 
 	while(1)                            
 	{
 		Create_Pack(&jie,strlen(jie));
-//		printf("welcome to learn jiejie stm32 library!\n");
+//		printf("\n");
+//	printf("welcome to learn jiejie stm32 library!\n");
 		Delay_ms(5000);
 	}
 }
@@ -75,6 +76,8 @@ static void BSP_Init(void)
 	
 	/* 外部中断初始化 */
 	EXTI_Key_Config(); 
+	
+	CRC_Config();
 	
 	/* 打印信息 */
 //	printf("welcome to learn jiejie stm32 library!\n");

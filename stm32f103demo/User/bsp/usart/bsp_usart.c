@@ -26,8 +26,13 @@
   ******************************************************************
   */ 
 #if USE_USART_DMA_RX
-static void USARTx_DMA_Config(void);
+static void USARTx_DMA_Rx_Config(void);
 #endif
+
+#if USE_USART_DMA_TX
+static void USARTx_DMA_Tx_Config(void);
+#endif
+
 static void NVIC_Configuration(void);
  /**
   * @brief  配置嵌套向量中断控制器NVIC
@@ -99,16 +104,28 @@ void USART_Config(void)
 	// 串口中断优先级配置
 	NVIC_Configuration();
 	
+#if USE_USART_DMA
+
 #if USE_USART_DMA_RX 
+
 	// 开启 串口空闲IDEL 中断
 	USART_ITConfig(DEBUG_USARTx, USART_IT_IDLE, ENABLE);  
   // 开启串口DMA接收
 	USART_DMACmd(DEBUG_USARTx, USART_DMAReq_Rx, ENABLE); 
 	/* 使能串口DMA */
-	USARTx_DMA_Config();
+	USARTx_DMA_Rx_Config();
+	
 #else
 	// 使能串口接收中断
 	USART_ITConfig(DEBUG_USARTx, USART_IT_RXNE, ENABLE);	
+#endif
+
+#if USE_USART_DMA_TX 
+	// 开启串口DMA发送
+//	USART_DMACmd(DEBUG_USARTx, USART_DMAReq_Tx, ENABLE); 
+	USARTx_DMA_Tx_Config();
+#endif
+
 #endif
 
 	// 使能串口
@@ -117,9 +134,9 @@ void USART_Config(void)
 
 #if USE_USART_DMA_RX 
 
-char Usart_Rx_Buf[USART_RX_BUFF_SIZE];
+uint8_t Usart_Rx_Buf[USART_RX_BUFF_SIZE];
 
-static void USARTx_DMA_Config(void)
+static void USARTx_DMA_Rx_Config(void)
 {
 	DMA_InitTypeDef DMA_InitStructure;
 
@@ -195,6 +212,76 @@ void Uart_DMA_Rx_Data(void)
 }
 
 #endif
+
+#if USE_USART_DMA_TX 
+
+uint8_t Usart_Tx_Buf[USART_TX_BUFF_SIZE];
+
+static void USARTx_DMA_Tx_Config(void)
+{
+		DMA_InitTypeDef DMA_InitStructure;
+	
+		// 开启DMA时钟
+		RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
+		// 设置DMA源地址：串口数据寄存器地址*/
+    DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)USART_DR_ADDRESS;
+		// 内存地址(要传输的变量的指针)
+		DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)Usart_Tx_Buf;
+		// 方向：从内存到外设	
+		DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralDST;
+		// 传输大小	
+		DMA_InitStructure.DMA_BufferSize = USART_TX_BUFF_SIZE;
+		// 外设地址不增	    
+		DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
+		// 内存地址自增
+		DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
+		// 外设数据单位	
+		DMA_InitStructure.DMA_PeripheralDataSize = 
+	  DMA_PeripheralDataSize_Byte;
+		// 内存数据单位
+		DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;	 
+		// DMA模式，一次或者循环模式
+		DMA_InitStructure.DMA_Mode = DMA_Mode_Normal ;
+		//DMA_InitStructure.DMA_Mode = DMA_Mode_Circular;	
+		// 优先级：中	
+		DMA_InitStructure.DMA_Priority = DMA_Priority_Medium; 
+		// 禁止内存到内存的传输
+		DMA_InitStructure.DMA_M2M = DMA_M2M_Disable;
+		// 配置DMA通道		   
+		DMA_Init(USART_TX_DMA_CHANNEL, &DMA_InitStructure);		
+		// 使能DMA
+		DMA_Cmd (USART_TX_DMA_CHANNEL,ENABLE);
+}
+
+//开启一次DMA传输
+//DMA_Streamx:DMA数据流,DMA1_Stream0~7/DMA2_Stream0~7 
+//ndtr:数据传输量  
+/**
+  ******************************************************************
+  * @brief   开启一次DMA传输
+  * @author  jiejie
+  * @version V1.0
+  * @date    2018-xx-xx
+  * @param   len: 数据传输量(长度)
+  * @return  NULL
+  ******************************************************************
+  */ 
+void DMA_Send_Data(uint32_t len)
+{
+ 
+	DMA_Cmd(USART_TX_DMA_CHANNEL, DISABLE);                     //关闭DMA传输 
+//	
+////	while (DMA_GetCmdStatus(DMA_Streamx) != DISABLE){}	//确保DMA可以被设置  
+//		
+	DMA_SetCurrDataCounter(USART_TX_DMA_CHANNEL,len);          //数据传输量  
+// 
+	DMA_Cmd(USART_TX_DMA_CHANNEL, ENABLE); 
+  USART_DMACmd(DEBUG_USARTx, USART_DMAReq_Tx, ENABLE);       //开启DMA传输 
+}	  
+
+#endif
+
+
 
 /*****************  发送一个字节 **********************/
 void Usart_SendByte( USART_TypeDef * pUSARTx, uint8_t ch)

@@ -3,6 +3,7 @@
 
 
 #include "stm32f10x.h"
+#include "stm32f10x_dma.h"
 #include <stdio.h>
 
 /** 
@@ -11,19 +12,23 @@
 	* 2-修改GPIO的宏
   */
 /* 使用串口DMA接收 */
+
+#define  USE_USART_DMA  1
 #define  USE_USART_DMA_RX  1
 
-#if USE_USART_DMA_RX
+#if USE_USART_DMA_RX  
 // 串口对应的DMA请求通道
 #define  USART_RX_DMA_CHANNEL     DMA1_Channel5
 // 外设寄存器地址
 #define  USART_DR_ADDRESS        (&DEBUG_USARTx->DR)
 // 一次发送的数据量
 #define  USART_RX_BUFF_SIZE            1000 
+/* 声明接收buff数组 */
+extern uint8_t Usart_Rx_Buf[USART_RX_BUFF_SIZE];
 #endif
 
 /* 使用串口DMA发送 */
-#define  USE_USART_DMA_TX  1
+#define  USE_USART_DMA_TX  0
 
 #if USE_USART_DMA_TX
 // 串口对应的DMA请求通道
@@ -32,7 +37,11 @@
 #define  USART_DR_ADDRESS        (&DEBUG_USARTx->DR)
 // 一次发送的数据量
 #define  USART_TX_BUFF_SIZE            1000 
+/* 声明发送buff数组 */
+extern uint8_t Usart_Tx_Buf[USART_TX_BUFF_SIZE];
 #endif
+	
+	
 	
 // 串口1-USART1
 #define  DEBUG_USARTx                   USART1
@@ -134,6 +143,9 @@ void USART_Config(void);
 void Uart_DMA_Rx_Data(void);
 #endif
 
+#if USE_USART_DMA_TX
+void DMA_Send_Data(uint32_t len);
+#endif
 void Usart_SendByte( USART_TypeDef * pUSARTx, uint8_t ch);
 void Usart_SendString( USART_TypeDef * pUSARTx, char *str);
 void Usart_SendHalfWord( USART_TypeDef * pUSARTx, uint16_t ch);
