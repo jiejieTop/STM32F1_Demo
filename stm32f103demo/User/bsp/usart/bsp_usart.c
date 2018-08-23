@@ -32,7 +32,23 @@ static void USARTx_DMA_Rx_Config(void);
 #if USE_USART_DMA_TX
 static void USARTx_DMA_Tx_Config(void);
 #endif
+/**
+  ******************************************************************
+														变量声明
+  ******************************************************************
+  */ 
+uint8_t Usart_Rx_Buf[USART_RX_BUFF_SIZE];
 
+/************************************************************
+  * @brief   NVIC_Configuration
+  * @param   NULL
+  * @return  NULL
+  * @author  jiejie
+  * @github  https://github.com/jiejieTop
+  * @date    2018-xx-xx
+  * @version v1.0
+  * @note    配置串口的NVIC 一般配置为4位抢占优先级即可
+  ***********************************************************/
 static void NVIC_Configuration(void);
  /**
   * @brief  配置嵌套向量中断控制器NVIC
@@ -133,8 +149,6 @@ void USART_Config(void)
 }
 
 #if USE_USART_DMA_RX 
-
-uint8_t Usart_Rx_Buf[USART_RX_BUFF_SIZE];
 
 static void USARTx_DMA_Rx_Config(void)
 {
@@ -253,9 +267,6 @@ static void USARTx_DMA_Tx_Config(void)
 		DMA_Cmd (USART_TX_DMA_CHANNEL,ENABLE);
 }
 
-//开启一次DMA传输
-//DMA_Streamx:DMA数据流,DMA1_Stream0~7/DMA2_Stream0~7 
-//ndtr:数据传输量  
 /**
   ******************************************************************
   * @brief   开启一次DMA传输
@@ -385,11 +396,11 @@ void DEBUG_USART_IRQHandler(void)
 #else
 	/* 不使用串口DMA */
 	uint8_t ucTemp;
+  uint8_t ucTemp1;
 	if(USART_GetITStatus(DEBUG_USARTx,USART_IT_RXNE)!=RESET)
 	{		
 		ucTemp = USART_ReceiveData(DEBUG_USARTx);
-		printf("%c",ucTemp);
-//		USART_SendData(DEBUG_USARTx,ucTemp);    
+    
 	}
 #endif
 }

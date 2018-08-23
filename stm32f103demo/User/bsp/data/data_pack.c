@@ -40,7 +40,6 @@
   */ 
 int32_t Send_DataPack(void *buff,uint16_t data_len)
 {
-
 #if USE_USART_DMA_TX	
 	uint8_t *pTxBuf = Usart_Tx_Buf;
 #else

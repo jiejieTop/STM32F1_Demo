@@ -552,14 +552,19 @@
               <FilePath>..\..\User\stm32f10x_conf.h</FilePath>
             </File>
             <File>
-              <FileName>stm32f10x_it.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\User\stm32f10x_it.h</FilePath>
-            </File>
-            <File>
               <FileName>include.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\User\include.h</FilePath>
+            </File>
+            <File>
+              <FileName>config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\User\config.h</FilePath>
+            </File>
+            <File>
+              <FileName>debuglog.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\User\debuglog.h</FilePath>
             </File>
             <File>
               <FileName>stm32f10x_it.c</FileName>
