@@ -14,8 +14,8 @@
   *
   ******************************************************************************
   */
-
-#include "./crc/bsp_crc.h"
+#include "include.h"
+//#include "./crc/bsp_crc.h"
 
 __IO uint32_t CRCValue = 0;		 // 用于存放产生的CRC校验值
 

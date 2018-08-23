@@ -22,15 +22,14 @@
 #include "./led/bsp_led.h" 
 
 #include "./usart/bsp_usart.h"
-/* include 数据打包文件 */
-#include "./usart/data_pack.h"
 
 #include "./crc/bsp_crc.h"
 
 #include "./SysTick/bsp_SysTick.h"
 
 
-
+/* include 数据处理相关文件 */
+#include "./data/data_pack.h"
 
 
 

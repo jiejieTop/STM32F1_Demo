@@ -16,8 +16,8 @@
   */ 
 	
 /* usartÍ·ÎÄ¼ş */
-#include "./usart/bsp_usart.h"
-
+//#include "./usart/bsp_usart.h"
+#include "include.h"
 
 
 /**

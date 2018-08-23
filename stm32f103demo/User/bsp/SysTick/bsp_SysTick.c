@@ -1,7 +1,6 @@
-  
-#include "bsp_SysTick.h"
-#include "core_cm3.h"
-#include "misc.h"
+/* 头文件 */
+#include "include.h"
+
 
 static __IO u32 TimingDelay;
  
@@ -18,7 +17,7 @@ void SysTick_Init(void)
 	 */
 	if (SysTick_Config(SystemCoreClock / 100000))	// ST3.5.0库版本
 	{ 
-		/* Capture error */ 
+		/* Capture error */
 		while (1);
 	}
 }

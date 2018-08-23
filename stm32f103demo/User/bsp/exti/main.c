@@ -15,8 +15,7 @@
   *
   ******************************************************************************
   */ 
-
-#include "stm32f10x.h"
+//#include "stm32f10x.h"
 #include "include.h"
 /**
   ******************************************************************
@@ -42,7 +41,6 @@ static void BSP_Init(void);
   */ 
 int main(void)
 {
-	
 	char jie[] = "123456789";
 	
 	BSP_Init();
@@ -50,9 +48,7 @@ int main(void)
 	while(1)                            
 	{
 		Send_DataPack(&jie,strlen(jie));
-//		printf("\n");
-//	printf("welcome to learn jiejie stm32 library!\n");
-		Delay_ms(5000);
+		Delay_ms(3000);
 	}
 }
 
@@ -81,7 +77,7 @@ static void BSP_Init(void)
 	CRC_Config();
 	
 	/* ¥Ú”°–≈œ¢ */
-//	printf("welcome to learn jiejie stm32 library!\n");
+	DEBUG_LOG("welcome to learn jiejie stm32 library!\n");
 	
 }
 

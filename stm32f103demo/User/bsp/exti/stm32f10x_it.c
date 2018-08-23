@@ -24,10 +24,10 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f10x_it.h"
-#include "./led/bsp_led.h"
-#include "./exti/bsp_exti.h"
-
+//#include "stm32f10x_it.h"
+//#include "./led/bsp_led.h"
+//#include "./exti/bsp_exti.h"
+#include "include.h"
 /** @addtogroup STM32F10x_StdPeriph_Template
   * @{
   */
