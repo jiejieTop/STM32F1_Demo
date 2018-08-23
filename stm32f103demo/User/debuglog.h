@@ -9,6 +9,10 @@
 
 #if  DEBUG_LOG_ENABLE 
 #define DEBUG_LOG 	printf                 ///<Run log print
+#else
+#define DEBUG_LOG 	printf 
+#endif
+
 
 #ifndef DEBUG_LOG_NOFORMAT
 #define DEBUG_LOG_NOFORMAT 	printf
