@@ -307,7 +307,7 @@ void Receive_DataPack(void)
   * @version v1.0
   * @note    数据包处理，解析数据
   ***********************************************************/
-int32_t DataPack_Handle(uint8_t *buff,uint8_t *len)
+int32_t DataPack_Handle(uint8_t* buff,uint8_t* len)
 {
   uint16_t data_len;
   if((NULL == buff)||(NULL == len))
@@ -322,12 +322,23 @@ int32_t DataPack_Handle(uint8_t *buff,uint8_t *len)
   {
     /* 获取数据长度 */
     data_len = Usart_Rx_Sta & 0x3fff;
+#if USE_DATA_CRC
+    *len = data_len - 8;
+#else
+    *len = data_len - 4;
+#endif
+    
     /* 清除接收完成标志位 */
     Usart_Rx_Sta = 0;
     /* 校验数据包是否一致 */
     if((DATA_HEAD == Usart_Rx_Buf[0])&&(DATA_TAIL == Usart_Rx_Buf[data_len-1]))
     {
-      memcpy(buff,Usart_Rx_Buf,data_len);
+      memcpy(buff,Usart_Rx_Buf+3,*len);
+    }
+    else
+    {
+      buff = NULL;
+      *len = 0;
     }
 #if USE_USART_DMA_RX
     /* 打开DMA，可以进行下一次接收 */
@@ -337,6 +348,7 @@ int32_t DataPack_Handle(uint8_t *buff,uint8_t *len)
   }
   return -1;
 }
+
 
 
 
