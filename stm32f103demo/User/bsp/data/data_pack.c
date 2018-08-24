@@ -9,24 +9,38 @@
   * @date    2018-xx-xx
   * 
 	* --------------------------------------------------------------------------
-	* |     起始帧    |   数据长度   |  有效数据   |   校验   |  结束帧        |
+	* |     起始帧    |   数据长度   |  有效数据   |   校验   |    结束帧      |
 	* --------------------------------------------------------------------------
-	* | cai(0x636169) |    length    |    buff     |   校验   |  jie(0x6a6965) |
+	* | cai(0x636169) |    length    |    buff     |   校验   |     0x55       |
 	* --------------------------------------------------------------------------
-	* |     uint32    |     uint16   |    buff     |  uint16  |     uint32     |
+	* |     uint8     |     uint16   |    buff     |  uint32  |     uint8      |
 	* -------------------------------------------------------------------------- 
-	* |     4字节     |     2字节    |    buff     |   4字节  |     4字节      |
+	* |     1字节     |     2字节    |    buff     |   4字节  |     1字节      |
 	* -------------------------------------------------------------------------- 
 	* 
 	******************************************************************
   */ 
+  
+/**                    Usart_Rx_Sta 
+	* ----------------------------------------------------------
+	* | 0  0  0  0 | 0  0  0  0 | 0  0  0  0 | 0  0  0  0|
+	* -----------------------------------------------------------
+	* | 1  1  0  0 | 0  0  0  0 | 0  0  0  0 | 0  0  0  0|
+	* -----------------------------------------------------------
+最高两位用于保存数据是否接收完成   0：未完成 1：完成
+次高位用于保存是否收到数据帧头     0：未完成 1：完成
+其他位用于保存数据长度
+*/
+/* 接收状态标记 */
+uint16_t Usart_Rx_Sta = 0;  
+
+  
 /**
   ******************************************************************
 														内部调用函数声明
   ******************************************************************
   */ 
-//static uint32_t Get_Data_Head(void);
-//static uint32_t Get_Data_Tail(void);
+
 
 /**
   ******************************************************************
@@ -60,11 +74,8 @@ int32_t Send_DataPack(void *buff,uint16_t data_len)
 		return -1;
 	}
 	/* 数据帧头 */
-	*pTxBuf ++= (uint8_t)NAME_HEAD1; 
-	*pTxBuf ++= (uint8_t)NAME_HEAD2; 
-	*pTxBuf ++= (uint8_t)NAME_HEAD3; 
-	*pTxBuf ++= (uint8_t)NAME_HEAD4; 
-	
+	*pTxBuf ++= (uint8_t)DATA_HEAD; 
+
 	/* 数据长度 */
 	*pTxBuf ++= (uint8_t)(data_len>>8);  
 	*pTxBuf ++= (uint8_t)(data_len);
@@ -72,10 +83,10 @@ int32_t Send_DataPack(void *buff,uint16_t data_len)
 	/* 有效数据 */
 	if(0 != data_len)
 	{
-		memcpy(Usart_Tx_Buf + 6 , buff , data_len);
+		memcpy(Usart_Tx_Buf + 3 , buff , data_len);
 	}
 	/* 数据偏移 */
-	pTxBuf = (Usart_Tx_Buf + 6 + data_len);
+	pTxBuf = (Usart_Tx_Buf + 3 + data_len);
 	
 #if USE_DATA_CRC 
 	/* 使用CRC校验 */
@@ -87,25 +98,23 @@ int32_t Send_DataPack(void *buff,uint16_t data_len)
 	*pTxBuf ++= CRCValue ; 
 #endif
 	/* 数据帧尾 */
-	*pTxBuf ++= (uint8_t)NAME_TAIL1; 
-	*pTxBuf ++= (uint8_t)NAME_TAIL2; 
-	*pTxBuf ++= (uint8_t)NAME_TAIL3; 
-	*pTxBuf ++= (uint8_t)NAME_TAIL4; 
+	*pTxBuf ++= (uint8_t)DATA_TAIL; 
+
 	
 #if USE_USART_DMA_TX	
 	
 #if USE_DATA_CRC 
-	DMA_Send_Data(data_len + 14);
+	DMA_Send_Data(data_len + 8);
 #else
-	DMA_Send_Data(data_len + 10);
+	DMA_Send_Data(data_len + 4);
 #endif
 
 #else
 
 #if USE_DATA_CRC 
-	res = Usart_Write(Usart_Tx_Buf,data_len + 14);
+	res = Usart_Write(Usart_Tx_Buf,data_len + 8);
 #else
-	res = Usart_Write(Usart_Tx_Buf,data_len + 10);
+	res = Usart_Write(Usart_Tx_Buf,data_len + 4);
 #endif
 	if(res < 0)
 	{
@@ -118,6 +127,20 @@ int32_t Send_DataPack(void *buff,uint16_t data_len)
 	
 	return 0;
 }
+#if USE_USART_DMA_TX
+void DMA_Send_Data(uint32_t len)
+{
+ 
+	DMA_Cmd(USART_TX_DMA_CHANNEL, DISABLE);                     //关闭DMA传输 
+//	
+////	while (DMA_GetCmdStatus(DMA_Streamx) != DISABLE){}	//确保DMA可以被设置  
+//		
+	DMA_SetCurrDataCounter(USART_TX_DMA_CHANNEL,len);          //设置数据传输量  
+// 
+	DMA_Cmd(USART_TX_DMA_CHANNEL, ENABLE); 
+  USART_DMACmd(DEBUG_USARTx, USART_DMAReq_Tx, ENABLE);       //开启DMA传输 
+}	  
+#else
 
 int32_t Usart_Write(uint8_t *buf, uint32_t len)
 {
@@ -135,23 +158,8 @@ int32_t Usart_Write(uint8_t *buf, uint32_t len)
 	return len;
 }  
 
-
-
-#if (USE_USART_DMA_RX == 0)
-/**                    Usart_Rx_Sta 
-	* ----------------------------------------------------------
-	* | 0  0  0  0 | 0  0  0  0 | 0  0  0  0 | 0  0  0  0|
-	* -----------------------------------------------------------
-	* | 1  1  0  0 | 0  0  0  0 | 0  0  0  0 | 0  0  0  0|
-	* -----------------------------------------------------------
-最高两位用于保存数据是否接收完成   0：未完成 1：完成
-次高位用于保存是否收到数据帧头     0：未完成 1：完成
-其他位用于保存数据长度
-*/
-
-/* 接收状态标记 */
-uint16_t Usart_Rx_Sta = 0;  
 #endif
+
 
 /************************************************************
   * @brief   Usart_Receive_Data
@@ -163,92 +171,172 @@ uint16_t Usart_Rx_Sta = 0;
   * @version v1.0
   * @note    不使用串口 DMA 接收时调用的函数
   ***********************************************************/
-int32_t Receive_DataPack(void)
+#if USE_USART_DMA_RX
+void Uart_DMA_Rx_Data(void)
+{
+	/* 接收的数据长度 */
+	uint32_t buff_length;
+	
+	/* 关闭DMA ，防止干扰 */
+	DMA_Cmd(USART_RX_DMA_CHANNEL, DISABLE);  
+	
+	/* 获取接收到的数据长度 单位为字节*/
+	buff_length = USART_RX_BUFF_SIZE - DMA_GetCurrDataCounter(USART_RX_DMA_CHANNEL);
+  
+  /* 获取数据长度 */
+  Usart_Rx_Sta = buff_length;
+  
+#if DEBUG_LOG_ENABLE	
+	DEBUG_LOG("buff_length = %d\n ",buff_length);
+#endif
+  
+	/* 清DMA标志位 */
+	DMA_ClearFlag( DMA1_FLAG_TC5 );          
+	
+	/* 重新赋值计数值，必须大于等于最大可能接收到的数据帧数目 */
+	USART_RX_DMA_CHANNEL->CNDTR = USART_RX_BUFF_SIZE;    
+  
+//	DMA_Cmd(USART_RX_DMA_CHANNEL, ENABLE);    /* 暂时关闭dma，数据尚未处理 */   
+	
+	/* 给出信号 ，发送接收到新数据标志，供前台程序查询 */
+	
+    /* 标记接收完成，在 DataPack_Handle 处理*/
+  Usart_Rx_Sta |= 0x8000;
+  
+	/* 
+	DMA 开启，等待数据。注意，如果中断发送数据帧的速率很快，MCU来不及处理此次接收到的数据，
+	中断又发来数据的话，这里不能开启，否则数据会被覆盖。有2种方式解决：
+
+	1. 在重新开启接收DMA通道之前，将LumMod_Rx_Buf缓冲区里面的数据复制到另外一个数组中，
+	然后再开启DMA，然后马上处理复制出来的数据。
+
+	2. 建立双缓冲，在LumMod_Uart_DMA_Rx_Data函数中，重新配置DMA_MemoryBaseAddr 的缓冲区地址，
+	那么下次接收到的数据就会保存到新的缓冲区中，不至于被覆盖。
+	*/
+}
+
+#else
+void Receive_DataPack(void)
 {
   uint8_t res;
   /* 读取数据 */
   res = USART_ReceiveData(DEBUG_USARTx);
   /* 接收未完成 */
   if((Usart_Rx_Sta&0x8000)==0)
+  {
+    /* 收到数据帧头 */
+    if(Usart_Rx_Sta&0x4000)
     {
-      /* 收到数据帧头 */
-      if(Usart_Rx_Sta&0x4000)
+      if(res!=NAME_TAIL)
+      {
+        Usart_Rx_Buf[Usart_Rx_Sta&0X3FFF]=res;
+        Usart_Rx_Sta++;
+        if(Usart_Rx_Sta>(USART_RX_BUFF_SIZE-1))
         {
-          if(res!=NAME_TAIL4)
-          {
-            Usart_Rx_Buf[Usart_Rx_Sta&0X3FFF]=res;
-            Usart_Rx_Sta++;
-            if(Usart_Rx_Sta>(USART_RX_BUFF_SIZE-1))
-            {
-              Usart_Rx_Sta=0;/* 接收数据错误,重新开始接收 */ 
-              return -1;
-            }
-          }
-          else 
-          {
-            /* 判断数据长度与接受的长度是否一致 */
-            if((((Usart_Rx_Buf[4]-'0')*10)+(Usart_Rx_Buf[5]-'0')+10) == (Usart_Rx_Sta&0X3FFF))
-            {
-              Usart_Rx_Sta|=0x8000;	/* 接收完成 */
-              Usart_Rx_Buf[Usart_Rx_Sta&0X3FFF]=res;
-              return 0;
-            }
-            else
-            {
-              Usart_Rx_Buf[Usart_Rx_Sta&0X3FFF]=res;
-              Usart_Rx_Sta++;
-              if(Usart_Rx_Sta>(USART_RX_BUFF_SIZE-1))
-              {
-                Usart_Rx_Sta=0;/* 接收数据错误,重新开始接收 */ 
-                return -1;
-              }
-            }
-          }
+          Usart_Rx_Sta=0;/* 接收数据错误,重新开始接收 */ 
+          #if DEBUG_LOG_ENABLE
+          DEBUG_LOG(">> DataPack Receive Fail!\n");
+          #endif
         }
+      }
       else 
-        {	
-          if(res==NAME_HEAD1)
-          {
-            /* 收到数据帧头 */
-            Usart_Rx_Sta|=0x4000;
-            Usart_Rx_Buf[Usart_Rx_Sta&0X3FFF]=res;
-            Usart_Rx_Sta++;
-          }
-          else
-            return -1;	
+      {
+        /* 判断数据长度与接受的长度是否一致 */
+        #if USE_DATA_CRC
+        if((((Usart_Rx_Buf[1]-'0')*10)+(Usart_Rx_Buf[2]-'0')+8) == (Usart_Rx_Sta&0X3FFF))
+        #else
+        if((((Usart_Rx_Buf[1]-'0')*10)+(Usart_Rx_Buf[2]-'0')+4) == (Usart_Rx_Sta&0X3FFF))
+        #endif
+        {
+          Usart_Rx_Sta|=0x8000;	/* 接收完成 */
+          Usart_Rx_Buf[Usart_Rx_Sta&0X3FFF]=res;
+          #if DEBUG_LOG_ENABLE
+          DEBUG_LOG(">> DataPack Receive Succes!\n");
+          #endif
         }
-     }  
+        else
+        {
+          Usart_Rx_Buf[Usart_Rx_Sta&0X3FFF]=res;
+          Usart_Rx_Sta++;
+          if(Usart_Rx_Sta>(USART_RX_BUFF_SIZE-1))
+          {
+            /* 接收数据错误,重新开始接收 */
+            Usart_Rx_Sta=0; 
+            #if DEBUG_LOG_ENABLE
+            DEBUG_LOG(">> DataPack Receive Fail!\n");
+            #endif
+          }
+        }
+      }
+    }
+    else 
+    {	
+      if(res==NAME_HEAD)
+      {
+        /* 收到数据帧头 */
+        Usart_Rx_Sta|=0x4000;
+        Usart_Rx_Buf[Usart_Rx_Sta&0X3FFF]=res;
+        Usart_Rx_Sta++;
+      }
+      else
+      {
+        /* 接受数据错误 */
+        Usart_Rx_Sta = 0;
+        #if DEBUG_LOG_ENABLE
+        DEBUG_LOG("DataPack Receive Fail!");
+        #endif
+      }
+    }
+  }
+  else
+  {
+    #if DEBUG_LOG_ENABLE
+    DEBUG_LOG(">> Data Receive Too Fast\n");
+    #endif 
+  }    
 }
+#endif
 
-
-
-///**
-//  ******************************************************************
-//  * @brief   获取数据包起始帧(最大是4字节)，目前配置为3字节，按需修改即可
-//  * @author  jiejie
-//  * @version V1.0
-//  * @date    2018-xx-xx
-//  ******************************************************************
-//  */ 
-//static uint32_t Get_Data_Head(void)
-//{
-//	return  (uint32_t)(NAME_TAIL1 << 24) | (NAME_TAIL2 << 16) | \
-//										(NAME_TAIL3 << 8) | (NAME_TAIL4);
-//}
-
-///**
-//  ******************************************************************
-//  * @brief   获取数据包结束帧(最大是4字节)，目前配置为3字节，
-//  * @author  jiejie
-//  * @version V1.0
-//  * @date    2018-xx-xx
-//  ******************************************************************
-//  */ 
-//static uint32_t Get_Data_Tail(void)
-//{
-//	return  (uint32_t)(NAME_HEAD1 << 24) | (NAME_HEAD2 << 16) | \
-//										(NAME_HEAD3 << 8) | (NAME_HEAD4);
-//}
+/************************************************************
+  * @brief   DataPack_Handle
+  * @param   NULL
+  * @return  NULL
+  * @author  jiejie
+  * @github  https://github.com/jiejieTop
+  * @date    2018-xx-xx
+  * @version v1.0
+  * @note    数据包处理，解析数据
+  ***********************************************************/
+int32_t DataPack_Handle(uint8_t *buff,uint8_t *len)
+{
+  uint16_t data_len;
+  if((NULL == buff)||(NULL == len))
+  {
+    #if DEBUG_LOG_ENABLE
+    DEBUG_LOG(">> buff or len is NULL\n");
+    #endif 
+    return -1;
+  }
+  /* 接收完成 */
+  if( Usart_Rx_Sta & 0x8000 )
+  {
+    /* 获取数据长度 */
+    data_len = Usart_Rx_Sta & 0x3fff;
+    /* 清除接收完成标志位 */
+    Usart_Rx_Sta = 0;
+    /* 校验数据包是否一致 */
+    if((DATA_HEAD == Usart_Rx_Buf[0])&&(DATA_TAIL == Usart_Rx_Buf[data_len-1]))
+    {
+      memcpy(buff,Usart_Rx_Buf,data_len);
+    }
+#if USE_USART_DMA_RX
+    /* 打开DMA，可以进行下一次接收 */
+    DMA_Cmd(USART_RX_DMA_CHANNEL, ENABLE);
+#endif
+  return 0;
+  }
+  return -1;
+}
 
 
 

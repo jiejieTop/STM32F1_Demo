@@ -188,43 +188,6 @@ static void USARTx_DMA_Rx_Config(void)
 	// 使能DMA
 	DMA_Cmd (USART_RX_DMA_CHANNEL,ENABLE);
 }
-
-
-void Uart_DMA_Rx_Data(void)
-{
-	/* 接收的数据长度 */
-	uint32_t buff_length;
-	
-	/* 关闭DMA ，防止干扰 */
-	DMA_Cmd(USART_RX_DMA_CHANNEL, DISABLE);  
-	
-	/* 获取接收到的数据长度 单位为字节*/
-	buff_length = USART_RX_BUFF_SIZE - DMA_GetCurrDataCounter(USART_RX_DMA_CHANNEL);
-	
-	printf("buff_length = %d\n ",buff_length);
-	
-	/* 清DMA标志位 */
-	DMA_ClearFlag( DMA1_FLAG_TC5 );          
-	
-	/* 重新赋值计数值，必须大于等于最大可能接收到的数据帧数目 */
-	USART_RX_DMA_CHANNEL->CNDTR = USART_RX_BUFF_SIZE;    
-	
-	DMA_Cmd(USART_RX_DMA_CHANNEL, ENABLE);       
-	
-	/* 给出信号 ，发送接收到新数据标志，供前台程序查询 */
-	
-	/* 
-	DMA 开启，等待数据。注意，如果中断发送数据帧的速率很快，MCU来不及处理此次接收到的数据，
-	中断又发来数据的话，这里不能开启，否则数据会被覆盖。有2种方式解决：
-
-	1. 在重新开启接收DMA通道之前，将LumMod_Rx_Buf缓冲区里面的数据复制到另外一个数组中，
-	然后再开启DMA，然后马上处理复制出来的数据。
-
-	2. 建立双缓冲，在LumMod_Uart_DMA_Rx_Data函数中，重新配置DMA_MemoryBaseAddr 的缓冲区地址，
-	那么下次接收到的数据就会保存到新的缓冲区中，不至于被覆盖。
-	*/
-}
-
 #endif
 
 #if USE_USART_DMA_TX 
@@ -266,6 +229,8 @@ static void USARTx_DMA_Tx_Config(void)
 		// 使能DMA
 		DMA_Cmd (USART_TX_DMA_CHANNEL,ENABLE);
 }
+#endif
+
 
 /**
   ******************************************************************
@@ -277,21 +242,6 @@ static void USARTx_DMA_Tx_Config(void)
   * @return  NULL
   ******************************************************************
   */ 
-void DMA_Send_Data(uint32_t len)
-{
- 
-	DMA_Cmd(USART_TX_DMA_CHANNEL, DISABLE);                     //关闭DMA传输 
-//	
-////	while (DMA_GetCmdStatus(DMA_Streamx) != DISABLE){}	//确保DMA可以被设置  
-//		
-	DMA_SetCurrDataCounter(USART_TX_DMA_CHANNEL,len);          //数据传输量  
-// 
-	DMA_Cmd(USART_TX_DMA_CHANNEL, ENABLE); 
-  USART_DMACmd(DEBUG_USARTx, USART_DMAReq_Tx, ENABLE);       //开启DMA传输 
-}	  
-
-#endif
-
 
 
 /*****************  发送一个字节 **********************/
@@ -395,13 +345,10 @@ void DEBUG_USART_IRQHandler(void)
 		USART_ReceiveData( DEBUG_USARTx );
 	}	
 #else
-  int32_t err;
-  /* 接受中断 */
+  /* 接收中断 */
 	if(USART_GetITStatus(DEBUG_USARTx,USART_IT_RXNE)!=RESET)
 	{		
-    err = Receive_DataPack();
-    if(err < 0)
-      DEBUG_LOG("DataPack Receive False!");
+    Receive_DataPack();
 	}
 #endif
 }

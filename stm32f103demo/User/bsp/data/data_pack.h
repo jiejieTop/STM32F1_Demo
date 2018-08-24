@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stdint.h>
 
+#include "./usart/bsp_usart.h"
 
 /**
   ******************************************************************
@@ -16,18 +17,11 @@
 
 #define USE_DATA_CRC  0
 /* 数据帧头 */
-#define NAME_HEAD1   'x'
-#define NAME_HEAD2   'c'
-#define NAME_HEAD3   'a'
-#define NAME_HEAD4   'i'
-/* 数据帧尾 */
-#define NAME_TAIL1   'x'
-#define NAME_TAIL2   'j'
-#define NAME_TAIL3   'i'
-#define NAME_TAIL4   'e'
+#define DATA_HEAD   0x55
 
-//#define DATA_HEAD   Get_Data_Head()
-//#define DATA_TAIL   Get_Data_Tail()
+/* 数据帧尾 */
+#define DATA_TAIL   0x55
+
 
 
 
@@ -55,8 +49,20 @@
   ******************************************************************
   */ 
 int32_t Send_DataPack(void *buff,uint16_t len);
+
+
+#if USE_USART_DMA_RX
+void Uart_DMA_Rx_Data(void);
+#else
+void Receive_DataPack(void);
+#endif
+
+#if USE_USART_DMA_TX
+void DMA_Send_Data(uint32_t len);
+#else
 int32_t Usart_Write(uint8_t *buf, uint32_t len);
-int32_t Receive_DataPack(void);
+#endif
+
 
 
 

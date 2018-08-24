@@ -16,10 +16,10 @@
 #define  USE_USART_DMA  1
 
 /* 使用串口DMA接收 */
-#define  USE_USART_DMA_RX  0
+#define  USE_USART_DMA_RX  1
 
 /* 使用串口DMA发送 */
-#define  USE_USART_DMA_TX  0
+#define  USE_USART_DMA_TX  1
 
 #if USE_USART_DMA_RX  
 // 串口对应的DMA请求通道
@@ -146,16 +146,6 @@ extern uint8_t Usart_Tx_Buf[USART_TX_BUFF_SIZE];
 
 /* 串口初始化，根据宏定义决定是否配置dma */
 void USART_Config(void);
-
-#if USE_USART_DMA_RX
-void Uart_DMA_Rx_Data(void);
-#endif
-
-#if USE_USART_DMA_TX
-void DMA_Send_Data(uint32_t len);
-#endif
-
-
 
 void Usart_SendByte( USART_TypeDef * pUSARTx, uint8_t ch);
 void Usart_SendString( USART_TypeDef * pUSARTx, char *str);
