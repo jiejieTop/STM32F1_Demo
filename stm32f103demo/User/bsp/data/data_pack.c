@@ -15,7 +15,7 @@
 	* --------------------------------------------------------------------------
 	* |     uint32    |     uint16   |    buff     |  uint16  |     uint32     |
 	* -------------------------------------------------------------------------- 
-	* |     4字节     |     2字节    |    buff     |   2字节  |     4字节      |
+	* |     4字节     |     2字节    |    buff     |   4字节  |     4字节      |
 	* -------------------------------------------------------------------------- 
 	* 
 	******************************************************************
@@ -134,6 +134,91 @@ int32_t Usart_Write(uint8_t *buf, uint32_t len)
 	}
 	return len;
 }  
+
+
+
+#if (USE_USART_DMA_RX == 0)
+/**                    Usart_Rx_Sta 
+	* ----------------------------------------------------------
+	* | 0  0  0  0 | 0  0  0  0 | 0  0  0  0 | 0  0  0  0|
+	* -----------------------------------------------------------
+	* | 1  1  0  0 | 0  0  0  0 | 0  0  0  0 | 0  0  0  0|
+	* -----------------------------------------------------------
+最高两位用于保存数据是否接收完成   0：未完成 1：完成
+次高位用于保存是否收到数据帧头     0：未完成 1：完成
+其他位用于保存数据长度
+*/
+
+/* 接收状态标记 */
+uint16_t Usart_Rx_Sta = 0;  
+#endif
+
+/************************************************************
+  * @brief   Usart_Receive_Data
+  * @param   NULL
+  * @return  NULL
+  * @author  jiejie
+  * @github  https://github.com/jiejieTop
+  * @date    2018-xx-xx
+  * @version v1.0
+  * @note    不使用串口 DMA 接收时调用的函数
+  ***********************************************************/
+int32_t Receive_DataPack(void)
+{
+  uint8_t res;
+  /* 读取数据 */
+  res = USART_ReceiveData(DEBUG_USARTx);
+  /* 接收未完成 */
+  if((Usart_Rx_Sta&0x8000)==0)
+    {
+      /* 收到数据帧头 */
+      if(Usart_Rx_Sta&0x4000)
+        {
+          if(res!=NAME_TAIL4)
+          {
+            Usart_Rx_Buf[Usart_Rx_Sta&0X3FFF]=res;
+            Usart_Rx_Sta++;
+            if(Usart_Rx_Sta>(USART_RX_BUFF_SIZE-1))
+            {
+              Usart_Rx_Sta=0;/* 接收数据错误,重新开始接收 */ 
+              return -1;
+            }
+          }
+          else 
+          {
+            /* 判断数据长度与接受的长度是否一致 */
+            if((((Usart_Rx_Buf[4]-'0')*10)+(Usart_Rx_Buf[5]-'0')+10) == (Usart_Rx_Sta&0X3FFF))
+            {
+              Usart_Rx_Sta|=0x8000;	/* 接收完成 */
+              Usart_Rx_Buf[Usart_Rx_Sta&0X3FFF]=res;
+              return 0;
+            }
+            else
+            {
+              Usart_Rx_Buf[Usart_Rx_Sta&0X3FFF]=res;
+              Usart_Rx_Sta++;
+              if(Usart_Rx_Sta>(USART_RX_BUFF_SIZE-1))
+              {
+                Usart_Rx_Sta=0;/* 接收数据错误,重新开始接收 */ 
+                return -1;
+              }
+            }
+          }
+        }
+      else 
+        {	
+          if(res==NAME_HEAD1)
+          {
+            /* 收到数据帧头 */
+            Usart_Rx_Sta|=0x4000;
+            Usart_Rx_Buf[Usart_Rx_Sta&0X3FFF]=res;
+            Usart_Rx_Sta++;
+          }
+          else
+            return -1;	
+        }
+     }  
+}
 
 
 

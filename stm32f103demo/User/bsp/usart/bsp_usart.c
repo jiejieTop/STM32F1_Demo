@@ -374,15 +374,7 @@ int fgetc(FILE *f)
 		return (int)USART_ReceiveData(DEBUG_USARTx);
 }
 
-#if (USE_USART_DMA_RX == 0)
-/* 接收状态标记 */
-uint16_t Usart_Rx_Sta = 0;     
-/* Usart_Rx_Sta 
-最高位用于保存数据是否接收完成 
-0：未完成 1：完成
-其他位用于保存数据长度
-*/
-#endif
+
 /**
   ******************************************************************
   * @brief   串口中断服务函数
@@ -403,33 +395,13 @@ void DEBUG_USART_IRQHandler(void)
 		USART_ReceiveData( DEBUG_USARTx );
 	}	
 #else
-	/* 不使用串口DMA */
-	uint8_t Res;
-  uint8_t ucTemp1;
-  
+  int32_t err;
+  /* 接受中断 */
 	if(USART_GetITStatus(DEBUG_USARTx,USART_IT_RXNE)!=RESET)
 	{		
-    /* 读取数据 */
-		Res = USART_ReceiveData(DEBUG_USARTx);
-		
-		if((Usart_Rx_Sta&0x8000)==0)//接收未完成
-			{
-			if(Usart_Rx_Sta&0x4000)//接收到了0x0d
-				{
-				if(Res!=0x0a)Usart_Rx_Sta=0;//接收错误,重新开始
-				else Usart_Rx_Sta|=0x8000;	//接收完成了 
-				}
-			else //还没收到0X0D
-				{	
-				if(Res==0x0d)Usart_Rx_Sta|=0x4000;
-//				else
-//					{
-//					USART_RX_BUF[USART_RX_STA&0X3FFF]=Res ;
-//					USART_RX_STA++;
-//					if(USART_RX_STA>(USART_REC_LEN-1))USART_RX_STA=0;//接收数据错误,重新开始接收	  
-//					}		 
-				}
-			}  
+    err = Receive_DataPack();
+    if(err < 0)
+      DEBUG_LOG("DataPack Receive False!");
 	}
 #endif
 }

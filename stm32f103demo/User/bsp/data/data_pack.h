@@ -16,12 +16,12 @@
 
 #define USE_DATA_CRC  0
 /* 数据帧头 */
-#define NAME_HEAD1   'n'
+#define NAME_HEAD1   'x'
 #define NAME_HEAD2   'c'
 #define NAME_HEAD3   'a'
 #define NAME_HEAD4   'i'
 /* 数据帧尾 */
-#define NAME_TAIL1   'n'
+#define NAME_TAIL1   'x'
 #define NAME_TAIL2   'j'
 #define NAME_TAIL3   'i'
 #define NAME_TAIL4   'e'
@@ -56,7 +56,7 @@
   */ 
 int32_t Send_DataPack(void *buff,uint16_t len);
 int32_t Usart_Write(uint8_t *buf, uint32_t len);
-
+int32_t Receive_DataPack(void);
 
 
 
