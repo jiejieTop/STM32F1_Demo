@@ -17,10 +17,10 @@
 
 #define USE_DATA_CRC  0
 /* 数据帧头 */
-#define DATA_HEAD   0x55
+#define DATA_HEAD   0x56
 
 /* 数据帧尾 */
-#define DATA_TAIL   0x55
+#define DATA_TAIL   0x5b
 
 
 
@@ -30,15 +30,14 @@
 													   变量声明
   ******************************************************************
   */ 
-//typedef struct datapack
-//{
-//	uint16_t data_length; // 数据长度
-//	uint16_t data_crc; // 数据长度
-//	uint32_t data_head; //数据头
-////	char data_type; 			//数据类型
-//	void* data; 		//数据
-//	uint32_t data_tail; //数据尾
-//}DataPack;
+typedef struct datapack
+{
+	uint8_t data_head; //数据头
+	uint8_t data_tail; //数据尾
+//	uint8_t data_type; 			//数据类型
+	uint16_t data_length; // 数据长度
+	uint32_t data_crc; // 数据校验
+}DataPack;
 
 
 
@@ -49,7 +48,7 @@
   ******************************************************************
   */ 
 int32_t Send_DataPack(void *buff,uint16_t len);
-
+int32_t DataPack_Handle(uint8_t* buff,DataPack* datapack);
 
 #if USE_USART_DMA_RX
 void Uart_DMA_Rx_Data(void);

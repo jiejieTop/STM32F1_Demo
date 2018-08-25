@@ -16,11 +16,6 @@
   
 #include "include.h"
 
-/* 使用串口 DMA */
-#ifndef USE_USART_DMA
-#define  USE_USART_DMA  1
-#endif
-
 /* 使用串口 DMA 发送 */
 #ifndef USE_USART_DMA_TX
 #define  USE_USART_DMA_TX  1
@@ -51,9 +46,14 @@ extern uint8_t Usart_Rx_Buf[USART_RX_BUFF_SIZE];
 #endif
 
 /* 使能打印调试日志 */
-#ifndef DEBUG_LOG_ENABLE
-#define DEBUG_LOG_ENABLE	1
+#ifndef PRINT_DEBUG_ENABLE
+#define PRINT_DEBUG_ENABLE	0		/* 打印调试信息 */
 #endif
-
+#ifndef PRINT_ERR_ENABLE
+#define PRINT_ERR_ENABLE		0		/* 打印错误信息 */
+#endif
+#ifndef PRINT_INFO_ENABLE
+#define PRINT_INFO_ENABLE		1		/* 打印个人信息 */
+#endif
 
 #endif /* __CONFIG_H */

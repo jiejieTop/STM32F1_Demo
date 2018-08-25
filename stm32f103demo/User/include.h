@@ -11,8 +11,8 @@
 #include <string.h>
 #include <stdint.h>
 
-/* 日志头文件 */
-#include "debuglog.h"
+/* debug头文件 */
+#include "debug.h"
 
 /* 板级头文件 */
 #include "./exti/bsp_exti.h"

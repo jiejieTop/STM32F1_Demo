@@ -11,15 +11,12 @@
 	* 1-修改总线时钟的宏，uart1挂载到apb2总线，其他uart挂载到apb1总线
 	* 2-修改GPIO的宏
   */
-  
-/* 使用串口DMA*/
-#define  USE_USART_DMA  1
-
+ 
 /* 使用串口DMA接收 */
-#define  USE_USART_DMA_RX  1
+#define  USE_USART_DMA_RX  	0
 
 /* 使用串口DMA发送 */
-#define  USE_USART_DMA_TX  1
+#define  USE_USART_DMA_TX 	0
 
 #if USE_USART_DMA_RX  
 // 串口对应的DMA请求通道

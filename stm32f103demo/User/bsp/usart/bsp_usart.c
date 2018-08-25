@@ -120,17 +120,13 @@ void USART_Config(void)
 	// 串口中断优先级配置
 	NVIC_Configuration();
 	
-#if USE_USART_DMA
-
 #if USE_USART_DMA_RX 
-
 	// 开启 串口空闲IDEL 中断
 	USART_ITConfig(DEBUG_USARTx, USART_IT_IDLE, ENABLE);  
   // 开启串口DMA接收
 	USART_DMACmd(DEBUG_USARTx, USART_DMAReq_Rx, ENABLE); 
 	/* 使能串口DMA */
 	USARTx_DMA_Rx_Config();
-	
 #else
 	// 使能串口接收中断
 	USART_ITConfig(DEBUG_USARTx, USART_IT_RXNE, ENABLE);	
@@ -140,8 +136,6 @@ void USART_Config(void)
 	// 开启串口DMA发送
 //	USART_DMACmd(DEBUG_USARTx, USART_DMAReq_Tx, ENABLE); 
 	USARTx_DMA_Tx_Config();
-#endif
-
 #endif
 
 	// 使能串口

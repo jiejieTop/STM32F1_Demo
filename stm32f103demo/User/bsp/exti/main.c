@@ -41,14 +41,21 @@ static void BSP_Init(void);
   */ 
 int main(void)
 {
-	char jie[] = "123456789";
-	
+//	char jie[] = "123456789";
+	uint8_t res[50];
+	DataPack datapack;
+	int32_t err;
 	BSP_Init();
-	
 	while(1)                            
 	{
-		Send_DataPack(&jie,strlen(jie));
-		Delay_ms(3000);
+		err = DataPack_Handle(res,&datapack);
+		if(err == 0)
+		{
+			Send_DataPack(res,datapack.data_length);
+		}
+		
+//		
+//		Delay_ms(3000);
 	}
 }
 
@@ -77,7 +84,7 @@ static void BSP_Init(void)
 	CRC_Config();
 	
 	/* ¥Ú”°–≈œ¢ */
-	DEBUG_LOG("welcome to learn jiejie stm32 library!\n");
+	PRINT_INFO("welcome to learn jiejie stm32 library!\n");
 	
 }
 
