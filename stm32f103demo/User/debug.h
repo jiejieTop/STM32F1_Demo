@@ -5,7 +5,7 @@
 * @name Log print 
 * @{
 */
-#define PRINT_DEBUG_ENABLE		1	/* 打印调试信息 */
+#define PRINT_DEBUG_ENABLE		1		/* 打印调试信息 */
 #define PRINT_ERR_ENABLE			1		/* 打印错误信息 */
 #define PRINT_INFO_ENABLE			0		/* 打印个人信息 */
 
@@ -37,7 +37,7 @@
 #endif
 
 /* 断言 Assert */
-#define AssertCalled(char,int) 	printf("Error:%s,%d\r\n",char,int)
+#define AssertCalled(char,int) 	printf("\nError:%s,%d\r\n",char,int)
 #define ASSERT(x)   if((x)==0)  AssertCalled(__FILE__,__LINE__)
   
 typedef enum 

@@ -11,9 +11,9 @@
 	* --------------------------------------------------------------------------
 	* |     起始帧    |   数据长度   |  有效数据   |   校验   |    结束帧      |
 	* --------------------------------------------------------------------------
-	* | cai(0x636169) |    length    |    buff     |   校验   |     0x55       |
+	* |     0x02      |    length    |    buff     |   校验   |     0x03       |
 	* --------------------------------------------------------------------------
-	* |     uint8     |     uint16   |    buff     |  uint32  |     uint8      |
+	* |     uint8     |    uint16    |    buff     |  uint32  |     uint8      |
 	* -------------------------------------------------------------------------- 
 	* |     1字节     |     2字节    |    buff     |   4字节  |     1字节      |
 	* -------------------------------------------------------------------------- 
@@ -178,7 +178,7 @@ void Uart_DMA_Rx_Data(void)
 	uint32_t buff_length;
 	
 	/* 关闭DMA ，防止干扰 */
-	DMA_Cmd(USART_RX_DMA_CHANNEL, DISABLE);  
+	DMA_Cmd(USART_RX_DMA_CHANNEL, DISABLE);  /* 暂时关闭dma，数据尚未处理 */ 
 	
 	/* 获取接收到的数据长度 单位为字节*/
 	buff_length = USART_RX_BUFF_SIZE - DMA_GetCurrDataCounter(USART_RX_DMA_CHANNEL);
@@ -194,12 +194,12 @@ void Uart_DMA_Rx_Data(void)
 	/* 重新赋值计数值，必须大于等于最大可能接收到的数据帧数目 */
 	USART_RX_DMA_CHANNEL->CNDTR = USART_RX_BUFF_SIZE;    
   
-//	DMA_Cmd(USART_RX_DMA_CHANNEL, ENABLE);    /* 暂时关闭dma，数据尚未处理 */   
+//	DMA_Cmd(USART_RX_DMA_CHANNEL, ENABLE);      
 	
 	/* 给出信号 ，发送接收到新数据标志，供前台程序查询 */
 	
     /* 标记接收完成，在 DataPack_Handle 处理*/
-  Usart_Rx_Sta |= 0x8000;
+  Usart_Rx_Sta |= 0x80000000;
   
 	/* 
 	DMA 开启，等待数据。注意，如果中断发送数据帧的速率很快，MCU来不及处理此次接收到的数据，
@@ -212,7 +212,6 @@ void Uart_DMA_Rx_Data(void)
 	那么下次接收到的数据就会保存到新的缓冲区中，不至于被覆盖。
 	*/
 }
-
 #else
 void Receive_DataPack(void)
 {
@@ -224,29 +223,33 @@ void Receive_DataPack(void)
 	{
 		if(Usart_Rx_Sta&0x40000000)//接收到了DATA_HEAD
 		{
-			if(res!=DATA_TAIL)
+			if(res!=DATA_TAIL)/* 收到的不是数据帧尾 */
 			{
-			Usart_Rx_Buf[Usart_Rx_Sta&0XFFFF]=res ;
-			Usart_Rx_Sta++;
+				/* 正常接收数据 */
+				Usart_Rx_Buf[Usart_Rx_Sta&0XFFFF]=res ;
+				Usart_Rx_Sta++;
 			}
 			else
 			{
-			Usart_Rx_Buf[Usart_Rx_Sta&0XFFFF]=res ;
-			Usart_Rx_Sta++;
-			Usart_Rx_Sta|=0x80000000;		//接收完成了 
-			PRINT_ERR("receive ok!");
+				/* 把数据帧尾也接收 */
+				Usart_Rx_Buf[Usart_Rx_Sta&0XFFFF]=res ;
+				Usart_Rx_Sta++;
+				Usart_Rx_Sta|=0x80000000;		/* 接收完成了 */ 
+				PRINT_DEBUG("receive ok!");
+				PRINT_DEBUG("buff_length = %d",Usart_Rx_Sta&0XFFFF);
 			}
 		}
-		else //还没收到DATA_HEAD
+		else /* 还没收到DATA_HEAD */
 		{	
-			if(res==DATA_HEAD)
+			if(res==DATA_HEAD)	/* 收到数据帧头 */
 			{
 				Usart_Rx_Buf[Usart_Rx_Sta&0XFFFF]=res ;
 				Usart_Rx_Sta++;
-				Usart_Rx_Sta|=0x40000000;
+				Usart_Rx_Sta|=0x40000000;/* 标记接收到帧头 */
 			}
-			else
+			else/* 接收错误 */
 			{
+				Usart_Rx_Sta = 0;
 				PRINT_ERR("receive fail!");
 			}		 
 		}
@@ -257,8 +260,8 @@ void Receive_DataPack(void)
 
 /************************************************************
   * @brief   DataPack_Handle
-  * @param   NULL
-  * @return  NULL
+	* @param   buff:数据保存的起始地址。datapack:数据信息保存的结构体指针
+  * @return  返回0代表接收成功。其他代表错误 。
   * @author  jiejie
   * @github  https://github.com/jiejieTop
   * @date    2018-xx-xx
@@ -268,9 +271,11 @@ void Receive_DataPack(void)
 int32_t DataPack_Handle(uint8_t* buff,DataPack* datapack)
 {
   uint16_t data_len;
+	uint8_t *pbuff = Usart_Rx_Buf;
   if((NULL == buff)||(NULL == datapack))
   {
     PRINT_ERR("buff or len is NULL\n");
+		ASSERT(ASSERT_ERR);
     return -1;
   }
   /* 接收完成 */
@@ -279,22 +284,26 @@ int32_t DataPack_Handle(uint8_t* buff,DataPack* datapack)
     /* 获取数据长度 */
     data_len = Usart_Rx_Sta & 0xffff;
 #if USE_DATA_CRC
-    *len = data_len - 8;
+    datapack->data_length = data_len - 8;
 #else
     datapack->data_length = data_len - 4;
 #endif
-    
     /* 清除接收完成标志位 */
     Usart_Rx_Sta = 0;
     /* 校验数据包是否一致 */
     if((DATA_HEAD == Usart_Rx_Buf[0])&&(DATA_TAIL == Usart_Rx_Buf[data_len-1]))
     {
-      memcpy(buff,&Usart_Rx_Buf[3],datapack->data_length);
+      memcpy(buff,pbuff+3,datapack->data_length);
+			PRINT_DEBUG("data_length = %d",datapack->data_length);
+			PRINT_DEBUG("pbuff+3 = %s",pbuff+3);
+			PRINT_DEBUG("data = %s",buff);
+			PRINT_DEBUG("data handle ok！");
+			memset(Usart_Rx_Buf,0,data_len);
     }
     else
     {
-			PRINT_DEBUG("data length is not equal!\n");
-			memset(Usart_Rx_Buf,0,data_len+1);
+			PRINT_ERR("data length is not equal!");
+			memset(Usart_Rx_Buf,0,data_len);
       buff = NULL;
       datapack->data_length = 0;
     }

@@ -17,10 +17,10 @@
 
 #define USE_DATA_CRC  0
 /* 数据帧头 */
-#define DATA_HEAD   0x56
+#define DATA_HEAD   0x02
 
 /* 数据帧尾 */
-#define DATA_TAIL   0x5b
+#define DATA_TAIL   0x03
 
 
 
