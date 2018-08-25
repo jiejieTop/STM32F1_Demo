@@ -41,7 +41,7 @@ static void BSP_Init(void);
   */ 
 int main(void)
 {
-	char jie[] = "123456789";
+//	char jie[] = "123456789";
 	uint8_t res[50];
 	DataPack datapack;
 	int32_t err;
@@ -54,7 +54,7 @@ int main(void)
 			Send_DataPack(res,datapack.data_length);
 		}
 		
-		Delay_ms(3000);
+//		Delay_ms(3000);
 	}
 }
 

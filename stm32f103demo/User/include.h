@@ -27,8 +27,6 @@
 
 #include "./SysTick/bsp_SysTick.h"
 
-/* 内核延时函数 */
-#include "./dwt/dwt_delay.h"
 
 /* include 数据处理相关文件 */
 #include "./data/data_pack.h"
