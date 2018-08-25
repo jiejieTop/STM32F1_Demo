@@ -49,7 +49,7 @@ uint32_t Usart_Rx_Sta = 0;
   * @version V1.0
   * @date    2018-xx-xx
   * @param   buff:数据起始地址
-  * @return  成功 or 失败
+  * @return  0：发送成功，其他表示失败
   ******************************************************************
   */ 
 int32_t Send_DataPack(void *buff,uint16_t data_len)
@@ -109,8 +109,8 @@ int32_t Send_DataPack(void *buff,uint16_t data_len)
 	DMA_Send_Data(data_len + 4);
 #endif
 
-#else
 
+#else
 #if USE_DATA_CRC 
 	res = Usart_Write(Usart_Tx_Buf,data_len + 8);
 #else
@@ -122,12 +122,22 @@ int32_t Send_DataPack(void *buff,uint16_t data_len)
 		ASSERT(ASSERT_ERR);
 		return -2;
 	}
-	
 #endif
 	
 	return 0;
 }
+
 #if USE_USART_DMA_TX
+/************************************************************
+  * @brief   DMA_Send_Data
+	* @param   len : 发送的数据长度 （字节）
+  * @return  NULL
+  * @author  jiejie
+  * @github  https://github.com/jiejieTop
+  * @date    2018-xx-xx
+  * @version v1.0
+  * @note    
+  ***********************************************************/
 void DMA_Send_Data(uint32_t len)
 {
  
@@ -160,9 +170,8 @@ int32_t Usart_Write(uint8_t *buf, uint32_t len)
 
 #endif
 
-
 /************************************************************
-  * @brief   Usart_Receive_Data
+  * @brief   Uart_DMA_Rx_Data
   * @param   NULL
   * @return  NULL
   * @author  jiejie
@@ -294,11 +303,10 @@ int32_t DataPack_Handle(uint8_t* buff,DataPack* datapack)
     if((DATA_HEAD == Usart_Rx_Buf[0])&&(DATA_TAIL == Usart_Rx_Buf[data_len-1]))
     {
       memcpy(buff,pbuff+3,datapack->data_length);
+			memset(Usart_Rx_Buf,0,data_len);
 			PRINT_DEBUG("data_length = %d",datapack->data_length);
-			PRINT_DEBUG("pbuff+3 = %s",pbuff+3);
 			PRINT_DEBUG("data = %s",buff);
 			PRINT_DEBUG("data handle ok！");
-			memset(Usart_Rx_Buf,0,data_len);
     }
     else
     {

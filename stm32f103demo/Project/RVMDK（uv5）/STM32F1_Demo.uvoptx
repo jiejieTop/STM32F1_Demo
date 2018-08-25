@@ -157,18 +157,18 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>285</LineNumber>
+          <LineNumber>36</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134222286</Address>
+          <Address>134223290</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>E:\jiejieTop\STM32F1_Demo\stm32f103demo\Project\User\bsp\data\data_pack.c</Filename>
+          <Filename>E:\jiejieTop\STM32F1_Demo\stm32f103demo\Project\User\bsp\dwt\dwt_delay.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\STM32_Demo\../../User/bsp/data/data_pack.c\285</Expression>
+          <Expression>\\STM32_Demo\../../User/bsp/dwt/dwt_delay.c\36</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -211,6 +211,16 @@
           <count>7</count>
           <WinNumber>1</WinNumber>
           <ItemText>Usart_Rx_Buf[data_len-1]</ItemText>
+        </Ww>
+        <Ww>
+          <count>8</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>ticks_delay</ItemText>
+        </Ww>
+        <Ww>
+          <count>9</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>ticks_end</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
