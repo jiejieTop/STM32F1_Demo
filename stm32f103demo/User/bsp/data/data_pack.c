@@ -268,7 +268,7 @@ void Receive_DataPack(void)
 #endif
 
 /************************************************************
-  * @brief   DataPack_Handle
+  * @brief   DataPack_Process
 	* @param   buff:数据保存的起始地址。datapack:数据信息保存的结构体指针
   * @return  返回0代表接收成功。其他代表错误 。
   * @author  jiejie
@@ -277,10 +277,12 @@ void Receive_DataPack(void)
   * @version v1.0
   * @note    数据包处理，解析数据
   ***********************************************************/
-int32_t DataPack_Handle(uint8_t* buff,DataPack* datapack)
+int32_t DataPack_Process(uint8_t* buff,DataPack* datapack)
 {
   uint16_t data_len;
+  uint16_t check_data_len;
 	uint8_t *pbuff = Usart_Rx_Buf;
+  
   if((NULL == buff)||(NULL == datapack))
   {
     PRINT_ERR("buff or len is NULL\n");
@@ -292,15 +294,24 @@ int32_t DataPack_Handle(uint8_t* buff,DataPack* datapack)
   {
     /* 获取数据长度 */
     data_len = Usart_Rx_Sta & 0xffff;
-#if USE_DATA_CRC
-    datapack->data_length = data_len - 8;
-#else
-    datapack->data_length = data_len - 4;
-#endif
     /* 清除接收完成标志位 */
     Usart_Rx_Sta = 0;
-    /* 校验数据包是否一致 */
-    if((DATA_HEAD == Usart_Rx_Buf[0])&&(DATA_TAIL == Usart_Rx_Buf[data_len-1]))
+    if(data_len < 4)
+    {
+      PRINT_ERR("datapack is mar!");
+      return -1;
+    }
+    else
+    {
+      datapack->data_length = *(pbuff+1)<<8|*(pbuff+2);
+    }
+#if USE_DATA_CRC
+    check_data_len = data_len - 8;
+#else
+    check_data_len = data_len - 4;
+#endif
+    /* 校验数据包是否完整 */
+    if(check_data_len == datapack->data_length)
     {
       memcpy(buff,pbuff+3,datapack->data_length);
 			memset(Usart_Rx_Buf,0,data_len);

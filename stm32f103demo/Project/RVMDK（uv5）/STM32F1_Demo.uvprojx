@@ -596,6 +596,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\User\bsp\data\data_pack.c</FilePath>
             </File>
+            <File>
+              <FileName>data_process.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\common\data_process.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

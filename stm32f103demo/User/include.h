@@ -30,6 +30,7 @@
 
 /* include 数据处理相关文件 */
 #include "./data/data_pack.h"
+#include "./common/data_process.h"
 
 
 

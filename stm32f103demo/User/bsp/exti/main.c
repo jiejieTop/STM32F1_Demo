@@ -48,7 +48,7 @@ int main(void)
 	BSP_Init();
 	while(1)                            
 	{
-		err = DataPack_Handle(res,&datapack);
+		err = DataPack_Process(res,&datapack);
 		if(err == 0)
 		{
 			Send_DataPack(res,datapack.data_length);
