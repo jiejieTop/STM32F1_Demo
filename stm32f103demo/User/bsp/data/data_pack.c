@@ -277,7 +277,7 @@ void Receive_DataPack(void)
   * @version v1.0
   * @note    数据包处理，解析数据
   ***********************************************************/
-int32_t DataPack_Process(uint8_t* buff,DataPack* datapack)
+int32_t DataPack_Process(uint8_t* buff,DataPack_t* datapack)
 {
   uint16_t data_len;
   uint16_t check_data_len;

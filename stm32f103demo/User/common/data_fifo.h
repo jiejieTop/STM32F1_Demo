@@ -26,38 +26,40 @@ typedef pthread_mutex_t spinlock_t;
 extern "C" {
 #endif
 
-struct kfifo {
-        unsigned char *buffer;  /* the buffer holding the data */
-        unsigned int size;      /* the size of the allocated buffer */
-        unsigned int in;        /* data is added at offset (in % size) */
-        unsigned int out;       /* data is extracted from off. (out % size) */
+typedef struct ringbuff 
+{
+	uint8_t *buffer;  	/* the buffer holding the data */
+	uint32_t size;      /* the size of the allocated buffer */
+	uint32_t in;        /* data is added at offset (in % size) */
+	uint32_t out;       /* data is extracted from off. (out % size) */
 #if USE_MUTEX
-        spinlock_t *lock;       /* protects concurrent modifications */
+	spinlock_t *lock;       /* protects concurrent modifications */
 #endif
-};
+}RingBuff_t;
 
-extern struct kfifo *kfifo_init(unsigned char *buffer, 
-																unsigned int size
+extern err_t Create_RingBuff(RingBuff_t *rb, 
+                             uint8_t *buffer,
+                             uint32_t size
 #if USE_MUTEX
-																,spinlock_t *lock
+                             ,spinlock_t *lock
 #endif
-																);
+                            );
 																
-extern struct kfifo *kfifo_alloc(unsigned int size
-#if USE_MUTEX
-																,spinlock_t *lock
-#endif
-																);
-																
-extern void kfifo_free(struct kfifo *fifo);
+//extern struct kfifo *kfifo_alloc(unsigned int size
+//#if USE_MUTEX
+//																,spinlock_t *lock
+//#endif
+//																);
+//																
+//extern void kfifo_free(struct kfifo *fifo);
 
-extern unsigned int __kfifo_put(struct kfifo *fifo,
-                                unsigned char *buffer,
-																unsigned int len);
+extern uint32_t Write_RingBuff(RingBuff_t *rb,
+                               uint8_t *buffer, 
+                               uint32_t len);
 																
-extern unsigned int __kfifo_get(struct kfifo *fifo,
-                                unsigned char *buffer, 
-																unsigned int len);
+extern uint32_t Read_RingBuff(RingBuff_t *rb,
+                              uint8_t *buffer, 
+                              uint32_t len);
 
 
 

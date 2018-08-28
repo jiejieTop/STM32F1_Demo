@@ -37,7 +37,7 @@ typedef struct datapack
 //	uint8_t data_type; 			//数据类型
 	uint16_t data_length; // 数据长度
 	uint32_t data_crc; // 数据校验
-}DataPack;
+}DataPack_t;
 
 
 
@@ -48,7 +48,7 @@ typedef struct datapack
   ******************************************************************
   */ 
 int32_t Send_DataPack(void *buff,uint16_t len);
-int32_t DataPack_Process(uint8_t* buff,DataPack* datapack);
+int32_t DataPack_Process(uint8_t* buff,DataPack_t* datapack);
 
 #if USE_USART_DMA_RX
 void Uart_DMA_Rx_Data(void);

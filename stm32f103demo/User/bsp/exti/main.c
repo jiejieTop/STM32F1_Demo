@@ -43,7 +43,7 @@ int main(void)
 {
 //	char jie[] = "123456789";
 	uint8_t res[50];
-	DataPack datapack;
+	DataPack_t datapack;
 	int32_t err;
 	BSP_Init();
 	while(1)                            
