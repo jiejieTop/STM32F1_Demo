@@ -1,13 +1,20 @@
 #ifndef _DEBUG_H
 #define _DEBUG_H
-
+/************************************************************
+  * @brief   debug.h
+  * @author  jiejie
+  * @github  https://github.com/jiejieTop
+  * @date    2018-xx-xx
+  * @version v1.0
+  * @note    此文件用于打印日志信息
+  ***********************************************************/
 /**
 * @name Log print 
 * @{
 */
 #define PRINT_DEBUG_ENABLE		1		/* 打印调试信息 */
-#define PRINT_ERR_ENABLE			1		/* 打印错误信息 */
-#define PRINT_INFO_ENABLE			0		/* 打印个人信息 */
+#define PRINT_ERR_ENABLE			1 	/* 打印错误信息 */
+#define PRINT_INFO_ENABLE			1		/* 打印个人信息 */
 
 
 #if PRINT_DEBUG_ENABLE

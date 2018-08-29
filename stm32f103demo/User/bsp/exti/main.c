@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * @file    main.c
-  * @author  fire
+  * @author  jiejie
   * @version V1.0
   * @date    2018-xx-xx
   * @brief   main
@@ -15,7 +15,6 @@
   *
   ******************************************************************************
   */ 
-//#include "stm32f10x.h"
 #include "include.h"
 /**
   ******************************************************************
@@ -41,20 +40,11 @@ static void BSP_Init(void);
   */ 
 int main(void)
 {
-//	char jie[] = "123456789";
-	uint8_t res[50];
-	DataPack_t datapack;
-	int32_t err;
 	BSP_Init();
 	while(1)                            
 	{
-		err = DataPack_Process(res,&datapack);
-		if(err == 0)
-		{
-			Send_DataPack(res,datapack.data_length);
-		}
-		
-//		Delay_ms(3000);
+		LED1_TOGGLE;
+		Delay_ms(500);
 	}
 }
 
@@ -71,8 +61,13 @@ static void BSP_Init(void)
 	/* LED 初始化 */
 	LED_GPIO_Config();
 	
+#if USE_DWT_DELAY
+	/* 内核精确定时器初始化 */
+	CPU_TS_TmrInit();
+#else
 	/* 滴答定时器初始化 */
 	SysTick_Init();
+#endif
 	
 	/* 串口初始化 */
 	USART_Config();
@@ -90,11 +85,4 @@ static void BSP_Init(void)
 
 
 
-
-
-
-
-
-
-
-/*********************************************END OF FILE**********************/
+/********************************END OF FILE***************************************/

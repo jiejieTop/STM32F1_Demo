@@ -1,6 +1,16 @@
-/* 头文件 */
+/*
+	***********************************************************
+  * @brief   data_process.c
+  * @author  jiejie
+  * @github  https://github.com/jiejieTop
+  * @date    2018-xx-xx
+  * @version v1.0
+  * @note    此文件用于处理数据转换
+  ***********************************************************
+	*/
 
-#include "./common/data_process.h"
+/* 头文件 */
+#include "include.h"
 
 static int32_t isspace(int32_t x);
 static int32_t isdigit(int32_t x);
@@ -90,7 +100,6 @@ static int32_t isdigit(int32_t x)
         return 1;
     else
         return 0;
-
 }
 
 

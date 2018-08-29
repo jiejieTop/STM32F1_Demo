@@ -1,7 +1,6 @@
 /* 头文件 */
 #include "include.h"
 
-
 static __IO u32 TimingDelay;
  
 /**
@@ -15,28 +14,34 @@ void SysTick_Init(void)
 	 * SystemFrequency / 100000	 10us中断一次
 	 * SystemFrequency / 1000000 1us中断一次
 	 */
+#if USE_TICK_DELAY
 	if (SysTick_Config(SystemCoreClock / 100000))	// ST3.5.0库版本
 	{ 
 		/* Capture error */
 		while (1);
 	}
+#endif
 }
 
 /**
-  * @brief   us延时程序,10us为一个单位
+  * @brief   us延时程序,1us为一个单位
   * @param  
   *		@arg nTime: Delay_us( 1 ) 则实现的延时为 1 * 10us = 10us
   * @retval  无
   */
-void Delay_us(__IO u32 nTime)
+#if USE_TICK_DELAY
+void Delay_us(__IO uint32_t us)
 { 
-	TimingDelay = nTime;	
+	TimingDelay = us;	
 
 	// 使能滴答定时器  
 	SysTick->CTRL |=  SysTick_CTRL_ENABLE_Msk;
 
 	while(TimingDelay != 0);
 }
+#endif
+
+
 
 /**
   * @brief  获取节拍程序
@@ -82,7 +87,7 @@ static __INLINE uint32_t SysTick_Config(uint32_t ticks)
 // 当counter 从 reload 的值减小到0的时候，为一个循环，如果开启了中断则执行中断服务程序，
 // 同时 CTRL 的 countflag 位会置1
 // 这一个循环的时间为 reload * (1/systick_clk)
-
+#if USE_TICK_DELAY
 void SysTick_Delay_Us( __IO uint32_t us)
 {
 	uint32_t i;
@@ -111,7 +116,7 @@ void SysTick_Delay_Ms( __IO uint32_t ms)
 	// 关闭SysTick定时器
 	SysTick->CTRL &=~ SysTick_CTRL_ENABLE_Msk;
 }
-
+#endif
 
 
 /**
@@ -124,7 +129,9 @@ void SysTick_Delay_Ms( __IO uint32_t ms)
   */ 
 void SysTick_Handler(void)
 {
+#if USE_TICK_DELAY
 	TimingDelay_Decrement();	
+#endif
 }
 
 

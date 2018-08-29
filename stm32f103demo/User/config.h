@@ -3,8 +3,6 @@
 
 /************************************************************
   * @brief   config.h
-  * @param   NULL
-  * @return  NULL
   * @author  jiejie
   * @github  https://github.com/jiejieTop
   * @date    2018-xx-xx
@@ -56,4 +54,19 @@ extern uint8_t Usart_Rx_Buf[USART_RX_BUFF_SIZE];
 #define PRINT_INFO_ENABLE		1		/* 打印个人信息 */
 #endif
 
+/* 关于系统延时 推荐使用内核精确延时	*/
+
+#ifndef USE_DWT_DELAY
+#define USE_DWT_DELAY		1		/* 使用dwt内核精确延时 */
+#endif
+
+#if USE_DWT_DELAY
+#define USE_TICK_DELAY		0		/* 不使用SysTick延时 */
+#else
+#define USE_TICK_DELAY		1		/* 使用SysTick延时 */
+#endif
+
+
 #endif /* __CONFIG_H */
+
+/********************************END OF FILE***************************************/

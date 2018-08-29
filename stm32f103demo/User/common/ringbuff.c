@@ -1,15 +1,24 @@
-#include "./common/data_fifo.h"
+/*
+	***********************************************************
+  * @brief   ringbuff.c
+  * @author  jiejie
+  * @github  https://github.com/jiejieTop
+  * @date    2018-xx-xx
+  * @version v1.0
+  * @note    此文件用于处理环形缓冲区数据
+  ***********************************************************
+	*/
 
+#include "include.h"
+	
 #define kmalloc(size, mask) 		malloc(size)
 #define kfree(ptr) 							free(ptr)
-#define EXPORT_SYMBOL(sym)
 #define BUG_ON(cond) 						ASSERT(!(cond))
-#define ERR_PTR(val) NULL
-#define IS_ERR(val) (!(val))
 
 
 #define min(a,b)  ((a)>(b) ? (b) : (a)) 
-				
+
+/* 不同编译器选择 */
 #if defined(__GNUC__) || defined(__x86_64__)
 #define TPOOL_COMPILER_BARRIER() __asm__ __volatile("" : : : "memory")
 
@@ -21,6 +30,7 @@ static inline void FullMemoryBarrier()
 #define smp_rmb() TPOOL_COMPILER_BARRIER()
 #define smp_wmb() TPOOL_COMPILER_BARRIER()	
 #endif
+
 /*********************** 内部调用函数 ******************************/
 static int fls(int x)
 {
@@ -55,10 +65,24 @@ static int fls(int x)
 #define __attribute_const__     __attribute__((__const__))
 #endif
 
+/************************************************************
+  * @brief   roundup_pow_of_two
+  * @param   size：传递进来的数据长度
+  * @return  size：返回处理之后的数据长度
+  * @author  jiejie
+  * @github  https://github.com/jiejieTop
+  * @date    2018-xx-xx
+  * @version v1.0
+  * @note    用于处理数据，使数据长度必须为 2^n
+	*					 如果不是，则转换，丢弃多余部分，如
+	*					 roundup_pow_of_two(66) -> 返回 64
+  ***********************************************************/
 static unsigned long roundup_pow_of_two(unsigned long x)
 {
-        return (1UL << fls(x - 1));
+	return (1 << (fls(x-1)-1));				//向下对齐
+  //return (1UL << fls(x - 1));			//向上对齐，用动态内存可用使用
 }
+
 /*********************** 内部调用函数 ******************************/
 
 /************************************************************
@@ -73,7 +97,7 @@ static unsigned long roundup_pow_of_two(unsigned long x)
   * @version v1.0
   * @note    用于创建一个环形缓冲区
   ***********************************************************/
-err_t Create_RingBuff(RingBuff_t *rb, 
+err_t Create_RingBuff(RingBuff_t* rb, 
                       uint8_t *buffer,
                       uint32_t size
 #if USE_MUTEX
@@ -87,11 +111,14 @@ err_t Create_RingBuff(RingBuff_t *rb,
 		return ERR_NULL;
 	}
 	
-	/* 缓冲区大小必须为2^n字节(如果不是会强制转换，会丢弃部分字节空间) */
+	PRINT_DEBUG("ringbuff size is %d!",size);
+	/* 缓冲区大小必须为2^n字节,系统会强制转换,
+		 否则可能会导致指针访问非法地址。
+		 空间大小越大,强转时丢失内存越多 */
 	if(size&(size - 1))
 	{
 		size = roundup_pow_of_two(size);
-		PRINT_DEBUG("data is null!");
+		PRINT_DEBUG("change ringbuff size is %d!",size);
 	}
 
 	rb->buffer = buffer;
@@ -100,9 +127,36 @@ err_t Create_RingBuff(RingBuff_t *rb,
 #if USE_MUTEX	
 	rb->lock = lock;
 #endif
+	PRINT_DEBUG("create ringBuff ok!");
 	return ERR_OK;
 }
-EXPORT_SYMBOL(Create_RingBuff);
+
+/************************************************************
+  * @brief   Delete_RingBuff
+  * @param   rb：环形缓冲区句柄
+  * @return  err_t：ERR_OK表示成功，其他表示失败
+  * @author  jiejie
+  * @github  https://github.com/jiejieTop
+  * @date    2018-xx-xx
+  * @version v1.0
+  * @note    删除一个环形缓冲区
+  ***********************************************************/
+err_t Delete_RingBuff(RingBuff_t *rb)
+{
+	if(rb == NULL)
+	{
+		PRINT_ERR("ringbuff is null!");
+		return ERR_NULL;
+	}
+	
+	rb->buffer = NULL;
+	rb->size = 0;
+	rb->in = rb->out = 0;
+#if USE_MUTEX	
+	rb->lock = NULL;
+#endif
+	return ERR_OK;
+}
 
 /************************************************************
   * @brief   Write_RingBuff
@@ -134,10 +188,11 @@ uint32_t Write_RingBuff(RingBuff_t *rb,
   memcpy(rb->buffer, wbuff + l, len - l);
 
   rb->in += len;
-
+	
+	PRINT_DEBUG("write ringBuff len is %d!",len);
   return len;
 }
-EXPORT_SYMBOL(Write_RingBuff);
+
 /************************************************************
   * @brief   Read_RingBuff
   * @param   rb:环形缓冲区句柄
@@ -168,10 +223,78 @@ uint32_t Read_RingBuff(RingBuff_t *rb,
   memcpy(rbuff + l, rb->buffer, len - l);
 
   rb->out += len;
-
+	
+	PRINT_DEBUG("read ringBuff len is %d!",len);
   return len;
 }
-EXPORT_SYMBOL(Read_RingBuff);
 
+/************************************************************
+  * @brief   CanRead_RingBuff
+	* @param   rb:环形缓冲区句柄
+	* @return  uint32:可读数据长度 0 / len
+  * @author  jiejie
+  * @github  https://github.com/jiejieTop
+  * @date    2018-xx-xx
+  * @version v1.0
+  * @note    可读数据长度
+  ***********************************************************/
+uint32_t CanRead_RingBuff(RingBuff_t *rb)
+{
+	if(NULL == rb)
+	{
+		PRINT_ERR("ringbuff is null!");
+		return 0;
+	}
+	if(rb->in == rb->out)
+		return 0;
+	
+	if(rb->in > rb->out)
+		return (rb->in - rb->out);
+	
+	return (rb->size - (rb->out - rb->in));
+}
+
+/************************************************************
+  * @brief   CanRead_RingBuff
+	* @param   rb:环形缓冲区句柄
+	* @return  uint32:可写数据长度 0 / len
+  * @author  jiejie
+  * @github  https://github.com/jiejieTop
+  * @date    2018-xx-xx
+  * @version v1.0
+  * @note    可写数据长度
+  ***********************************************************/
+uint32_t CanWrite_RingBuff(RingBuff_t *rb)
+{
+	if(NULL == rb)
+	{
+		PRINT_ERR("ringbuff is null!");
+		return 0;
+	}
+
+	return (rb->size - CanRead_RingBuff(rb));
+}
+
+
+
+/******************************** DEMO *****************************************************/
+//	RingBuff_t ringbuff_handle;
+//	
+//	uint8_t rb[64];
+//	
+//	Create_RingBuff(&ringbuff_handle, 
+//								rb,
+//								sizeof(rb));
+//			Write_RingBuff(&ringbuff_handle,
+//                     res, 
+//                     datapack.data_length);
+//			
+//			PRINT_DEBUG("CanRead_RingBuff = %d!",CanRead_RingBuff(&ringbuff_handle));
+//			PRINT_DEBUG("CanWrite_RingBuff = %d!",CanWrite_RingBuff(&ringbuff_handle));
+//			
+//			Read_RingBuff(&ringbuff_handle,
+//                     res, 
+//                     datapack.data_length);
+/******************************** DEMO *****************************************************/
 
 

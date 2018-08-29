@@ -1,22 +1,13 @@
 /**
   ******************************************************************************
   * @file    bsp_exti.c
-  * @author  fire
+  * @author  jiejie
   * @version V1.0
   * @date    2013-xx-xx
   * @brief   I/O线中断应用bsp
   ******************************************************************************
-  * @attention
-  *
-  * 实验平台:野火 F103-霸道 STM32 开发板 
-  * 论坛    :http://www.firebbs.cn
-  * 淘宝    :https://fire-stm32.taobao.com
-  *
-  ******************************************************************************
   */
 #include "include.h"
-//#include "./led/bsp_led.h"
-//#include "./exti/bsp_exti.h"
 
  /**
   * @brief  配置嵌套向量中断控制器NVIC

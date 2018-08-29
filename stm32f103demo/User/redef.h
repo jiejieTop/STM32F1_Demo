@@ -2,9 +2,7 @@
 #define __REDEF_H
 
 /************************************************************
-  * @brief   __DATA_FIFO_H
-  * @param   NULL
-  * @return  NULL
+  * @brief   redeg.h
   * @author  jiejie
   * @github  https://github.com/jiejieTop
   * @date    2018-xx-xx
@@ -24,6 +22,9 @@ typedef   signed            int int32_t;
 typedef unsigned            char uint8_t;
 typedef unsigned short      int uint16_t;
 typedef unsigned            int uint32_t;
+
+
+typedef int32_t              err_t;       /**< Type for error number */
 
 
     /* minimum values of exact-width signed integer types */
@@ -47,8 +48,6 @@ typedef unsigned            int uint32_t;
 /* 32bit CPU */
 typedef long                base_t;      /**< Nbit CPU related date type */
 typedef unsigned long       ubase_t;     /**< Nbit unsigned CPU related data type */
-
-typedef base_t              err_t;       /**< Type for error number */
 
 /************************** 暂时不用区域 **********************************/
 //typedef uint32_t            time_t;      /**< Type for time stamp */
@@ -129,3 +128,7 @@ typedef base_t              err_t;       /**< Type for error number */
     
     
 #endif /* __REDEF_H */
+
+
+/********************************END OF FILE***************************************/
+
