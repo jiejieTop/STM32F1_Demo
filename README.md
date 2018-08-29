@@ -17,10 +17,14 @@ The bsp currently intended to be perfect includes:
 - key
 - exti
 - usart
-- usart+dma
-- usart+datapack
+- dma
+- idle
+- datapack
+- ringbuff
+- data_process
 - crc
 - SysTick
+- core_delay
 ---
 - dma(mem 2 mem)
 - i2c
