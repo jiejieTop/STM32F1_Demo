@@ -1,7 +1,5 @@
 /************************************************************
   * @brief   core_delay.c
-  * @param   NULL
-  * @return  NULL
   * @author  jiejie
   * @github  https://github.com/jiejieTop
   * @date    2018-xx-xx
