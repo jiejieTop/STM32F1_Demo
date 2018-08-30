@@ -32,7 +32,7 @@ static inline void FullMemoryBarrier()
 #endif
 
 /*********************** 内部调用函数 ******************************/
-static int fls(int x)
+static int32_t fls(int32_t x)
 {
   int r = 32;
 
@@ -86,8 +86,8 @@ static unsigned long roundup_pow_of_two(unsigned long x)
 /*********************** 内部调用函数 ******************************/
 
 /************************************************************
-  * @brief   Create_Fifo
-  * @param   fifo：环形缓冲区句柄
+  * @brief   Create_RingBuff
+  * @param   rb：环形缓冲区句柄
   *          buffer：环形缓冲区的数据区域
   *          size：环形缓冲区的大小，缓冲区大小要为2^n
   * @return  err_t：ERR_OK表示创建成功，其他表示失败
