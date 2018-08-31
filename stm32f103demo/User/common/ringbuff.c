@@ -32,6 +32,112 @@ static inline void FullMemoryBarrier()
 #endif
 
 /*********************** 内部调用函数 ******************************/
+
+/*********************************** mutex **************************************************/
+#if USE_MUTEX
+/************************************************************
+  * @brief   create_mutex
+  * @param   mutex:创建信号量句柄
+  * @return  创建成功为1，0为不成功。
+  * @author  jiejie
+  * @github  https://github.com/jiejieTop
+  * @date    2018-xx-xx
+  * @version v1.0
+  * @note    创建一个互斥量,用户在os中互斥使用ringbuff，
+  *          支持的os有rtt、win32、ucos、FreeRTOS
+  ***********************************************************/
+static err_t create_mutex(MUTEX_T *mutex)
+{
+  err_t ret = 0;
+
+//	*mutex = rt_mutex_create("test_mux",RT_IPC_FLAG_PRIO); /* rtt */
+//	ret = (int)(*mutex != RT_NULL);
+	
+//	*mutex = CreateMutex(NULL, FALSE, NULL);		/* Win32 */
+//	ret = (int)(*mutex != INVALID_HANDLE_VALUE);
+
+//	*mutex = OSMutexCreate(0, &err);		/* uC/OS-II */
+//	ret = (int)(err == OS_NO_ERR);
+
+//	*mutex = xSemaphoreCreateMutex();	/* FreeRTOS */
+//	ret = (int)(*mutex != NULL);
+  return ret;
+}
+/************************************************************
+  * @brief   deleta_mutex
+  * @param   mutex:互斥量句柄
+  * @return  NULL
+  * @author  jiejie
+  * @github  https://github.com/jiejieTop
+  * @date    2018-xx-xx
+  * @version v1.0
+  * @note    删除一个互斥量，支持的os有rtt、win32、ucos、FreeRTOS
+  ***********************************************************/
+static err_t deleta_mutex(MUTEX_T *mutex)
+{
+	err_t ret;
+	
+//	ret = rt_mutex_delete(mutex);	/* rtt */
+	
+//	ret = CloseHandle(mutex);	/* Win32 */
+
+//	OSMutexDel(mutex, OS_DEL_ALWAYS, &err);	/* uC/OS-II */
+//	ret = (int)(err == OS_NO_ERR);
+
+//  vSemaphoreDelete(mutex);		/* FreeRTOS */
+//	ret = 1;
+
+	return ret;
+}
+/************************************************************
+  * @brief   request_mutex
+  * @param   mutex:互斥量句柄
+  * @return  NULL
+  * @author  jiejie
+  * @github  https://github.com/jiejieTop
+  * @date    2018-xx-xx
+  * @version v1.0
+  * @note    请求一个互斥量，得到互斥量的线程才允许进行访问缓冲区
+  ***********************************************************/
+static err_t request_mutex(MUTEX_T *mutex)
+{
+	err_t ret;
+
+//	ret = (int)(rt_mutex_take(mutex, MUTEX_TIMEOUT) == RT_EOK);/* rtt */
+	
+//	ret = (int)(WaitForSingleObject(mutex, MUTEX_TIMEOUT) == WAIT_OBJECT_0);	/* Win32 */
+
+//	OSMutexPend(mutex, MUTEX_TIMEOUT, &err));		/* uC/OS-II */
+//	ret = (int)(err == OS_NO_ERR);
+
+//	ret = (int)(xSemaphoreTake(mutex, MUTEX_TIMEOUT) == pdTRUE);	/* FreeRTOS */
+
+	return ret;
+}
+/************************************************************
+  * @brief   release_mutex
+  * @param   mutex:互斥量句柄
+  * @return  NULL
+  * @author  jiejie
+  * @github  https://github.com/jiejieTop
+  * @date    2018-xx-xx
+  * @version v1.0
+  * @note    释放互斥量，当线程使用完资源必须释放互斥量
+  ***********************************************************/
+static void release_mutex(MUTEX_T *mutex)
+{
+//	rt_mutex_release(mutex);/* rtt */
+	
+//	ReleaseMutex(mutex);		/* Win32 */
+
+//	OSMutexPost(mutex);		/* uC/OS-II */
+
+//	xSemaphoreGive(mutex);	/* FreeRTOS */
+}
+#endif
+/*********************************** mutex **************************************************/
+
+/*********************************** data **************************************************/
 static int32_t fls(int32_t x)
 {
   int r = 32;
@@ -100,9 +206,6 @@ static unsigned long roundup_pow_of_two(unsigned long x)
 err_t Create_RingBuff(RingBuff_t* rb, 
                       uint8_t *buffer,
                       uint32_t size
-#if USE_MUTEX
-                      ,spinlock_t *lock
-#endif
 								)
 {
 	if((rb == NULL)||(buffer == NULL)||(size == 0))
@@ -125,7 +228,13 @@ err_t Create_RingBuff(RingBuff_t* rb,
 	rb->size = size;
 	rb->in = rb->out = 0;
 #if USE_MUTEX	
-	rb->lock = lock;
+  /* 创建信号量不成功 */
+  if(!create_mutex(rb->mutex))
+  {
+    PRINT_ERR("create mutex fail!");
+    ASSERT(ASSERT_ERR);
+    return ERR_NOK;
+  }
 #endif
 	PRINT_DEBUG("create ringBuff ok!");
 	return ERR_OK;
@@ -153,7 +262,11 @@ err_t Delete_RingBuff(RingBuff_t *rb)
 	rb->size = 0;
 	rb->in = rb->out = 0;
 #if USE_MUTEX	
-	rb->lock = NULL;
+  if(!deleta_mutex(rb->mutex))
+  {
+    PRINT_DEBUG("deleta mutex is fail!");
+    return ERR_NOK;
+  }
 #endif
 	return ERR_OK;
 }
@@ -176,7 +289,14 @@ uint32_t Write_RingBuff(RingBuff_t *rb,
                         uint32_t len)
 {
   uint32_t l;
-
+#if USE_MUTEX
+  /* 请求互斥量，成功才能进行ringbuff的访问 */
+  if(!request_mutex(rb->mutex))
+  {
+    PRINT_DEBUG("request mutex fail!");
+    return 0;
+  }
+#endif
   len = min(len, rb->size - rb->in + rb->out);
 
   /* 第一部分的拷贝:从环形缓冲区写入数据直至缓冲区最后一个地址 */
@@ -188,8 +308,12 @@ uint32_t Write_RingBuff(RingBuff_t *rb,
   memcpy(rb->buffer, wbuff + l, len - l);
 
   rb->in += len;
-	
-	PRINT_DEBUG("write ringBuff len is %d!",len);
+  
+  PRINT_DEBUG("write ringBuff len is %d!",len);
+#if USE_MUTEX
+  /* 释放互斥量 */
+  release_mutex(rb->mutex);
+#endif
   return len;
 }
 
@@ -211,7 +335,14 @@ uint32_t Read_RingBuff(RingBuff_t *rb,
                        uint32_t len)
 {
   uint32_t l;
-
+#if USE_MUTEX
+  /* 请求互斥量，成功才能进行ringbuff的访问 */
+  if(!request_mutex(rb->mutex))
+  {
+    PRINT_DEBUG("request mutex fail!");
+    return 0;
+  }
+#endif
   len = min(len, rb->in - rb->out);
 
   /* 第一部分的拷贝:从环形缓冲区读取数据直至缓冲区最后一个 */
@@ -225,6 +356,10 @@ uint32_t Read_RingBuff(RingBuff_t *rb,
   rb->out += len;
 	
 	PRINT_DEBUG("read ringBuff len is %d!",len);
+#if USE_MUTEX
+  /* 释放互斥量 */
+  release_mutex(rb->mutex);
+#endif
   return len;
 }
 
@@ -274,7 +409,6 @@ uint32_t CanWrite_RingBuff(RingBuff_t *rb)
 
 	return (rb->size - CanRead_RingBuff(rb));
 }
-
 
 
 /******************************** DEMO *****************************************************/

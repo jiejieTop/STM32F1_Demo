@@ -13,8 +13,21 @@
   ***********************************************************/
 #include "include.h"
 
+/************************************************************************
+  * 如果使用了互斥量进行资源保护，则需要按照os的互斥量控制块进行修改
+  * MUTEX_T 否则无法正常使用，并且用户需要自定义实现：
+  * err_t create_mutex(MUTEX_T *mutex) 
+  * err_t deleta_mutex(MUTEX_T *mutex)
+  * request_mutex(MUTEX_T *mutex)
+  * release_mutex(MUTEX_T *mutex)
+  * 这四个函数，该函数在ringbuff.c中已经定义，
+  * 目前支持的os有rtt、win32、ucos、FreeRTOS
+  ************************************************************************/
+#define  USE_MUTEX   0
+
 #if USE_MUTEX
-typedef pthread_mutex_t spinlock_t;
+#define  MUTEX_TIMEOUT   1000     /* 超时时间 */
+#define  MUTEX_T         mutex_t  /* 互斥量控制块 */
 #endif
 
 #define spin_lock_irqsave(lock_ptr, flags) pthread_mutex_lock(lock_ptr)
@@ -31,16 +44,13 @@ typedef struct ringbuff
 	uint32_t in;        /* data is added at offset (in % size) */
 	uint32_t out;       /* data is extracted from off. (out % size) */
 #if USE_MUTEX
-	spinlock_t *lock;       /* protects concurrent modifications */
+	MUTEX_T *mutex;       /* protects concurrent modifications */
 #endif
 }RingBuff_t ;
 
 extern err_t Create_RingBuff(RingBuff_t *rb, 
                              uint8_t *buffer,
                              uint32_t size
-#if USE_MUTEX
-                             ,spinlock_t *lock
-#endif
                             );
 																
 //extern struct kfifo *kfifo_alloc(unsigned int size
