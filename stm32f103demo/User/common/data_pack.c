@@ -241,12 +241,25 @@ void Receive_DataPack(void)
 			}
 			else
 			{
-				/* 把数据帧尾也接收 */
-				Usart_Rx_Buf[Usart_Rx_Sta&0XFFFF]=res ;
-				Usart_Rx_Sta++;
-				Usart_Rx_Sta|=0x80000000;		/* 接收完成了 */ 
-				PRINT_DEBUG("receive ok!");
-				PRINT_DEBUG("buff_length = %d",Usart_Rx_Sta&0XFFFF);
+        if((Usart_Rx_Sta & 0XFFFF)<=DATA_TAIL)
+        {
+          /* 数据长度小于等于3个字节，
+          说明收到的数据不是数据帧尾，
+          很可能是数据长度 0x03，
+          需要正常接收*/
+          /* 正常接收数据 */
+          Usart_Rx_Buf[Usart_Rx_Sta&0XFFFF]=res ;
+          Usart_Rx_Sta++;
+        }
+        else
+        {
+          /* 把数据帧尾也接收 */
+          Usart_Rx_Buf[Usart_Rx_Sta&0XFFFF]=res ;
+          Usart_Rx_Sta++;
+          Usart_Rx_Sta|=0x80000000;		/* 接收完成了 */ 
+          PRINT_DEBUG("receive ok!");
+          PRINT_DEBUG("buff_length = %d",Usart_Rx_Sta&0XFFFF);
+        }
 			}
 		}
 		else /* 还没收到DATA_HEAD */

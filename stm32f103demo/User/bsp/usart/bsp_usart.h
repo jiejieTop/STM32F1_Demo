@@ -13,7 +13,7 @@
   */
  
 /* 使用串口DMA接收 */
-#define  USE_USART_DMA_RX  	1
+#define  USE_USART_DMA_RX  	0
 
 /* 使用串口DMA发送 */
 #define  USE_USART_DMA_TX 	0

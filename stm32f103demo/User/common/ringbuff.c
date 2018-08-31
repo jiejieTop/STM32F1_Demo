@@ -281,7 +281,7 @@ uint32_t CanWrite_RingBuff(RingBuff_t *rb)
 //	RingBuff_t ringbuff_handle;
 //	
 //	uint8_t rb[64];
-//	
+//	uint8_t res[64];
 //	Create_RingBuff(&ringbuff_handle, 
 //								rb,
 //								sizeof(rb));
