@@ -40,9 +40,11 @@ static void BSP_Init(void);
   */ 
 int main(void)
 {
+  uint8_t ABC[] = "aaaaaa";
 	BSP_Init();
 	while(1)                            
 	{
+    Send_DataPack(ABC,sizeof(ABC));
 		LED1_TOGGLE;
 		Delay_ms(500);
 	}

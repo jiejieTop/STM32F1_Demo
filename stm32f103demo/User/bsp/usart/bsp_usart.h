@@ -24,12 +24,12 @@
 // 外设寄存器地址
 #define  USART_DR_ADDRESS        (&DEBUG_USARTx->DR)
 // 一次接收的数据量
-#define  USART_RX_BUFF_SIZE            1000 
+#define  USART_RX_BUFF_SIZE            255 
 /* 声明接收buff数组 */
 extern uint8_t Usart_Rx_Buf[USART_RX_BUFF_SIZE];
 #else
 // 一次接收的数据量
-#define  USART_RX_BUFF_SIZE            1000 
+#define  USART_RX_BUFF_SIZE            255 
 /* 声明接收buff数组 */
 extern uint8_t Usart_Rx_Buf[USART_RX_BUFF_SIZE];
 #endif

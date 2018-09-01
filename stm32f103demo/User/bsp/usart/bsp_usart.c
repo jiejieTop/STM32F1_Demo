@@ -323,8 +323,8 @@ void DEBUG_USART_IRQHandler(void)
 	/* 使用串口DMA */
 	if(USART_GetITStatus(DEBUG_USARTx,USART_IT_IDLE)!=RESET)
 	{		
-		/* 处理数据 */
-		Uart_DMA_Rx_Data();
+		/* 接收数据 */
+		Receive_DataPack();
 		// 清除空闲中断标志位
 		USART_ReceiveData( DEBUG_USARTx );
 	}	

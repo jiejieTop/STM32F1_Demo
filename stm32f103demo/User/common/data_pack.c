@@ -8,16 +8,15 @@
   * @version V1.0
   * @date    2018-xx-xx
   * 
-	* --------------------------------------------------------------------------
-	* |     起始帧    |   数据长度   |  有效数据   |   校验   |    结束帧      |
-	* --------------------------------------------------------------------------
-	* |     0x02      |    length    |    buff     |   校验   |     0x03       |
-	* --------------------------------------------------------------------------
-	* |     uint8     |    uint16    |    buff     |  uint32  |     uint8      |
-	* -------------------------------------------------------------------------- 
-	* |     1字节     |     2字节    |    buff     |   4字节  |     1字节      |
-	* -------------------------------------------------------------------------- 
-	* 
+	* --------------------------------------------------------------------
+	* | 起始帧 | 数据长度|  设备id  | 设备命令 | 有效数据 | 校验 | 结束帧 |
+	* --------------------------------------------------------------------
+	* |  0x02  | length  |system id |   cmd    |   buff   | crc  |  0x03  |
+	* --------------------------------------------------------------------
+	* |  uint8 | uint8   |  uint8   |  uint8   |   buff   |uint32|  uint8 |
+	* -------------------------------------------------------------------- 
+	* |  1字节 | 1字节   |  1字节   |  1字节   |   buff   |4字节 |  1字节 |
+	* --------------------------------------------------------------------
 	******************************************************************
   */ 
   
@@ -25,14 +24,12 @@
 	* ----------------------------------------------------------
 	* | 1  1  0  0 | 0  0  0  0 | 0  0  0  0 | 0  0  0  0|
 	* -----------------------------------------------------------
-	* | 0  0  0  0 | 0  0  0  0 | 0  0  0  0 | 0  0  0  0|
-	* -----------------------------------------------------------
-最高两位用于保存数据是否接收完成   0：未完成 1：完成
-次高位用于保存是否收到数据帧头     0：未完成 1：完成
-其他位用于保存数据长度
+  * 最高两位用于保存数据是否接收完成   0：未完成 1：完成
+  * 次高位用于保存是否收到数据帧头     0：未完成 1：完成
+  * 其他位用于保存数据包长度,数据包最大长度为(255)个字节
 */
 /* 接收状态标记 */
-uint32_t Usart_Rx_Sta = 0;  
+uint16_t Usart_Rx_Sta = 0;  
 
   
 /**
@@ -52,14 +49,22 @@ uint32_t Usart_Rx_Sta = 0;
   * @return  0：发送成功，其他表示失败
   ******************************************************************
   */ 
-int32_t Send_DataPack(void *buff,uint16_t data_len)
+int32_t Send_DataPack(void *buff,
+                      uint8_t data_len
+#if USE_SYSTEM_ID
+                      ,uint8_t sys_id
+#endif
+#if USE_SYSTEM_CMD
+                      ,uint8_t sys_cmd
+#endif
+)
 {
 #if USE_USART_DMA_TX	
 	uint8_t *pTxBuf = Usart_Tx_Buf;
 #else
 	/* 使用普通串口发送 */
 	int32_t res;
-	uint8_t Usart_Tx_Buf[data_len+8];
+	uint8_t Usart_Tx_Buf[data_len+9];
 	uint8_t *pTxBuf = Usart_Tx_Buf;
 #endif
 	
@@ -74,57 +79,53 @@ int32_t Send_DataPack(void *buff,uint16_t data_len)
 		return -1;
 	}
 	/* 数据帧头 */
-	*pTxBuf ++= (uint8_t)DATA_HEAD; 
+	*pTxBuf ++= (uint8_t)(DATA_HEAD); 
 
-	/* 数据长度 */
-	*pTxBuf ++= (uint8_t)(data_len>>8);  
+	/* 数据长度 */ 
 	*pTxBuf ++= (uint8_t)(data_len);
-	
+  
+  /* 设备id */ 
+#if USE_SYSTEM_ID
+  *pTxBuf ++= (uint8_t)(sys_id);
+#endif
+  /* 设备命令 */
+#if USE_SYSTEM_ID
+  *pTxBuf ++= (uint8_t)(sys_id);
+#endif
+
 	/* 有效数据 */
 	if(0 != data_len)
 	{
-		memcpy(Usart_Tx_Buf + 3 , buff , data_len);
+		memcpy(pTxBuf , buff , data_len);
 	}
 	/* 数据偏移 */
-	pTxBuf = (Usart_Tx_Buf + 3 + data_len);
+	pTxBuf = (pTxBuf + data_len);
 	
 #if USE_DATA_CRC 
 	/* 使用CRC校验 */
 	CRCValue = CRC_CalcBlockCRC((uint32_t *)buff, data_len);
 	/* 校验值 */
-	*pTxBuf ++= CRCValue >> 24; 
-	*pTxBuf ++= CRCValue >> 16; 
-	*pTxBuf ++= CRCValue >> 8;  
-	*pTxBuf ++= CRCValue ; 
+	*pTxBuf ++= (uint8_t)(CRCValue >> 24); 
+	*pTxBuf ++= (uint8_t)(CRCValue >> 16); 
+	*pTxBuf ++= (uint8_t)(CRCValue >> 8);  
+	*pTxBuf ++= (uint8_t)(CRCValue); 
 #endif
 	/* 数据帧尾 */
-	*pTxBuf ++= (uint8_t)DATA_TAIL; 
+	*pTxBuf ++= (uint8_t)(DATA_TAIL); 
 
-	
 #if USE_USART_DMA_TX	
-	
-#if USE_DATA_CRC 
-	DMA_Send_Data(data_len + 8);
+	DMA_Send_Data((pTxBuf - Usart_Tx_Buf));
 #else
-	DMA_Send_Data(data_len + 4);
-#endif
-
-
-#else
-#if USE_DATA_CRC 
-	res = Usart_Write(Usart_Tx_Buf,data_len + 8);
-#else
-	res = Usart_Write(Usart_Tx_Buf,data_len + 4);
-#endif
-	if(res < 0)
+	res = Usart_Send_Data(Usart_Tx_Buf,(pTxBuf - Usart_Tx_Buf));
+	if(res != ERR_OK)
 	{
 		PRINT_ERR("uart write error %d \n", res);
 		ASSERT(ASSERT_ERR);
-		return -2;
+		return res;
 	}
 #endif
 	
-	return 0;
+	return ERR_OK;
 }
 
 #if USE_USART_DMA_TX
@@ -138,7 +139,7 @@ int32_t Send_DataPack(void *buff,uint16_t data_len)
   * @version v1.0
   * @note    
   ***********************************************************/
-void DMA_Send_Data(uint32_t len)
+void DMA_Send_Data(uint16_t len)
 {
  
 	DMA_Cmd(USART_TX_DMA_CHANNEL, DISABLE);                     //关闭DMA传输 
@@ -152,20 +153,22 @@ void DMA_Send_Data(uint32_t len)
 }	  
 #else
 
-int32_t Usart_Write(uint8_t *buf, uint32_t len)
+err_t Usart_Send_Data(uint8_t *buf, uint16_t len)
 {
-	uint32_t i = 0;
+	uint16_t i = 0;
 	/* 判断 buff 非空 */
-	if(NULL == buf)
+	if((NULL == buf)||(len == 0))
 	{
-		return -1;
+    PRINT_ERR("send data is null!");
+		return ERR_NULL;
 	}
 	/* 循环发送，一个字节 */
 	for(i=0; i<len; i++)
 	{
 		Usart_SendByte(DEBUG_USARTx,buf[i]);
 	}
-	return len;
+  PRINT_DEBUG("send data length  is %d!",len);
+	return ERR_OK;
 }  
 
 #endif
@@ -181,7 +184,7 @@ int32_t Usart_Write(uint8_t *buf, uint32_t len)
   * @note    不使用串口 DMA 接收时调用的函数
   ***********************************************************/
 #if USE_USART_DMA_RX
-void Uart_DMA_Rx_Data(void)
+void Receive_DataPack(void)
 {
 	/* 接收的数据长度 */
 	uint32_t buff_length;
@@ -209,7 +212,7 @@ void Uart_DMA_Rx_Data(void)
 	/* 给出信号 ，发送接收到新数据标志，供前台程序查询 */
 	
   /* 标记接收完成，在 DataPack_Handle 处理*/
-  Usart_Rx_Sta |= 0x80000000;
+  Usart_Rx_Sta |= 0xC000;
   
 	/* 
 	DMA 开启，等待数据。注意，如果中断发送数据帧的速率很快，MCU来不及处理此次接收到的数据，
@@ -229,36 +232,36 @@ void Receive_DataPack(void)
   /* 读取数据会清除中断标志位 */
   res = USART_ReceiveData(DEBUG_USARTx);
 
-	if((Usart_Rx_Sta&0x80000000)==0)//接收未完成
+	if((Usart_Rx_Sta&0x8000)==0)//接收未完成
 	{
-		if(Usart_Rx_Sta&0x40000000)//接收到了DATA_HEAD
+		if(Usart_Rx_Sta&0x4000)//接收到了DATA_HEAD
 		{
 			if(res!=DATA_TAIL)/* 收到的不是数据帧尾 */
 			{
 				/* 正常接收数据 */
-				Usart_Rx_Buf[Usart_Rx_Sta&0XFFFF]=res ;
+				Usart_Rx_Buf[Usart_Rx_Sta&0XFF]=res ;
 				Usart_Rx_Sta++;
 			}
 			else
 			{
-        if((Usart_Rx_Sta & 0XFFFF)<=DATA_TAIL)
+        if((Usart_Rx_Sta & 0XFF)<=DATA_TAIL)
         {
           /* 数据长度小于等于3个字节，
           说明收到的数据不是数据帧尾，
           很可能是数据长度 0x03，
           需要正常接收*/
           /* 正常接收数据 */
-          Usart_Rx_Buf[Usart_Rx_Sta&0XFFFF]=res ;
+          Usart_Rx_Buf[Usart_Rx_Sta&0XFF]=res ;
           Usart_Rx_Sta++;
         }
         else
         {
           /* 把数据帧尾也接收 */
-          Usart_Rx_Buf[Usart_Rx_Sta&0XFFFF]=res ;
+          Usart_Rx_Buf[Usart_Rx_Sta&0XFF]=res ;
           Usart_Rx_Sta++;
-          Usart_Rx_Sta|=0x80000000;		/* 接收完成了 */ 
+          Usart_Rx_Sta|=0x8000;		/* 接收完成了 */ 
           PRINT_DEBUG("receive ok!");
-          PRINT_DEBUG("buff_length = %d",Usart_Rx_Sta&0XFFFF);
+          PRINT_DEBUG("buff_length = %d",Usart_Rx_Sta&0XFF);
         }
 			}
 		}
@@ -266,9 +269,9 @@ void Receive_DataPack(void)
 		{	
 			if(res==DATA_HEAD)	/* 收到数据帧头 */
 			{
-				Usart_Rx_Buf[Usart_Rx_Sta&0XFFFF]=res ;
+				Usart_Rx_Buf[Usart_Rx_Sta&0XFF]=res ;
 				Usart_Rx_Sta++;
-				Usart_Rx_Sta|=0x40000000;/* 标记接收到帧头 */
+				Usart_Rx_Sta|=0x4000;/* 标记接收到帧头 */
 			}
 			else/* 接收错误 */
 			{
@@ -304,7 +307,7 @@ err_t DataPack_Process(uint8_t* buff,DataPack_t* datapack)
     return ERR_NULL;
   }
   /* 接收完成 */
-  if( Usart_Rx_Sta & 0x80000000 )
+  if( Usart_Rx_Sta & 0x8000 )
   {
     /* 获取数据长度 */
     data_len = Usart_Rx_Sta & 0xffff;

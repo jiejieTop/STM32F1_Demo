@@ -1,13 +1,8 @@
 #ifndef __DATA_PACK_H
 #define __DATA_PACK_H
 
-#include "stm32f10x.h"
-/* c 标准库 */
-#include <stdio.h>
-#include <string.h>
-#include <stdint.h>
+#include "include.h"
 
-#include "./usart/bsp_usart.h"
 
 /**
   ******************************************************************
@@ -15,12 +10,16 @@
   ******************************************************************
   */ 
 
-#define USE_DATA_CRC  0
+#define USE_SYSTEM_ID   0
+#define USE_SYSTEM_CMD  0
+#define USE_DATA_CRC    0
+
 /* 数据帧头 */
 #define DATA_HEAD   0x02
 
 /* 数据帧尾 */
 #define DATA_TAIL   0x03
+
 
 
 
@@ -47,19 +46,28 @@ typedef struct datapack
 														函数声明
   ******************************************************************
   */ 
-int32_t Send_DataPack(void *buff,uint16_t len);
+int32_t Send_DataPack(void *buff,
+                      uint8_t data_len
+#if USE_SYSTEM_ID
+                      ,uint8_t sys_id
+#endif
+#if USE_SYSTEM_CMD
+                      ,uint8_t sys_cmd
+#endif
+);
+
 err_t DataPack_Process(uint8_t* buff,DataPack_t* datapack);
 
 #if USE_USART_DMA_RX
-void Uart_DMA_Rx_Data(void);
+void Receive_DataPack(void);
 #else
 void Receive_DataPack(void);
 #endif
 
 #if USE_USART_DMA_TX
-void DMA_Send_Data(uint32_t len);
+void DMA_Send_Data(uint16_t len);
 #else
-int32_t Usart_Write(uint8_t *buf, uint32_t len);
+err_t Usart_Send_Data(uint8_t *buf, uint16_t len);
 #endif
 
 
