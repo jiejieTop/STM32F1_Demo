@@ -72,7 +72,7 @@ uint32_t CPU_TS_TmrRd(void)
 //  * @brief  读取当前时间戳
 //  * @param  无
 //  * @retval 当前时间戳，即DWT_CYCCNT寄存器的值
-//	* 				此处给HAL库替换systick延时，用于os
+//	* 				此处给HAL库替换HAL_GetTick函数，用于os
 //  */
 //uint32_t HAL_GetTick(void)
 //{        
