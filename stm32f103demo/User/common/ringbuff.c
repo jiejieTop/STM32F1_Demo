@@ -44,23 +44,26 @@ static inline void FullMemoryBarrier()
   * @date    2018-xx-xx
   * @version v1.0
   * @note    创建一个互斥量,用户在os中互斥使用ringbuff，
-  *          支持的os有rtt、win32、ucos、FreeRTOS
+  *          支持的os有rtt、win32、ucos、FreeRTOS、LiteOS
   ***********************************************************/
 static err_t create_mutex(MUTEX_T *mutex)
 {
   err_t ret = 0;
 
 //	*mutex = rt_mutex_create("test_mux",RT_IPC_FLAG_PRIO); /* rtt */
-//	ret = (int)(*mutex != RT_NULL);
+//	ret = (err_t)(*mutex != RT_NULL);
 	
 //	*mutex = CreateMutex(NULL, FALSE, NULL);		/* Win32 */
-//	ret = (int)(*mutex != INVALID_HANDLE_VALUE);
+//	ret = (err_t)(*mutex != INVALID_HANDLE_VALUE);
 
 //	*mutex = OSMutexCreate(0, &err);		/* uC/OS-II */
-//	ret = (int)(err == OS_NO_ERR);
+//	ret = (err_t)(err == OS_NO_ERR);
 
 //	*mutex = xSemaphoreCreateMutex();	/* FreeRTOS */
-//	ret = (int)(*mutex != NULL);
+//	ret = (err_t)(*mutex != NULL);
+
+//  ret = LOS_MuxCreate(&mutex);  /* LiteOS */
+//	ret = (err_t)(ret != LOS_OK);
   return ret;
 }
 /************************************************************
@@ -71,7 +74,7 @@ static err_t create_mutex(MUTEX_T *mutex)
   * @github  https://github.com/jiejieTop
   * @date    2018-xx-xx
   * @version v1.0
-  * @note    删除一个互斥量，支持的os有rtt、win32、ucos、FreeRTOS
+  * @note    删除一个互斥量，支持的os有rtt、win32、ucos、FreeRTOS、LiteOS
   ***********************************************************/
 static err_t deleta_mutex(MUTEX_T *mutex)
 {
@@ -82,10 +85,13 @@ static err_t deleta_mutex(MUTEX_T *mutex)
 //	ret = CloseHandle(mutex);	/* Win32 */
 
 //	OSMutexDel(mutex, OS_DEL_ALWAYS, &err);	/* uC/OS-II */
-//	ret = (int)(err == OS_NO_ERR);
+//	ret = (err_t)(err == OS_NO_ERR);
 
 //  vSemaphoreDelete(mutex);		/* FreeRTOS */
 //	ret = 1;
+
+//  ret = LOS_MuxDelete(&mutex);  /* LiteOS */
+//	ret = (err_t)(ret != LOS_OK);
 
 	return ret;
 }
@@ -98,19 +104,22 @@ static err_t deleta_mutex(MUTEX_T *mutex)
   * @date    2018-xx-xx
   * @version v1.0
   * @note    请求一个互斥量，得到互斥量的线程才允许进行访问缓冲区
+  *          支持的os有rtt、win32、ucos、FreeRTOS、LiteOS
   ***********************************************************/
 static err_t request_mutex(MUTEX_T *mutex)
 {
 	err_t ret;
 
-//	ret = (int)(rt_mutex_take(mutex, MUTEX_TIMEOUT) == RT_EOK);/* rtt */
+//	ret = (err_t)(rt_mutex_take(mutex, MUTEX_TIMEOUT) == RT_EOK);/* rtt */
 	
-//	ret = (int)(WaitForSingleObject(mutex, MUTEX_TIMEOUT) == WAIT_OBJECT_0);	/* Win32 */
+//	ret = (err_t)(WaitForSingleObject(mutex, MUTEX_TIMEOUT) == WAIT_OBJECT_0);	/* Win32 */
 
 //	OSMutexPend(mutex, MUTEX_TIMEOUT, &err));		/* uC/OS-II */
-//	ret = (int)(err == OS_NO_ERR);
+//	ret = (err_t)(err == OS_NO_ERR);
 
-//	ret = (int)(xSemaphoreTake(mutex, MUTEX_TIMEOUT) == pdTRUE);	/* FreeRTOS */
+//	ret = (err_t)(xSemaphoreTake(mutex, MUTEX_TIMEOUT) == pdTRUE);	/* FreeRTOS */
+
+//  ret = (err_t)(LOS_MuxPend(mutex,MUTEX_TIMEOUT) == LOS_OK);  		/* LiteOS */
 
 	return ret;
 }
@@ -123,6 +132,7 @@ static err_t request_mutex(MUTEX_T *mutex)
   * @date    2018-xx-xx
   * @version v1.0
   * @note    释放互斥量，当线程使用完资源必须释放互斥量
+  *          支持的os有rtt、win32、ucos、FreeRTOS、LiteOS
   ***********************************************************/
 static void release_mutex(MUTEX_T *mutex)
 {
@@ -133,6 +143,8 @@ static void release_mutex(MUTEX_T *mutex)
 //	OSMutexPost(mutex);		/* uC/OS-II */
 
 //	xSemaphoreGive(mutex);	/* FreeRTOS */
+
+//  LOS_MuxPost(mutex);   /* LiteOS */
 }
 #endif
 /*********************************** mutex **************************************************/
