@@ -52,10 +52,10 @@ The bsp currently intended to be perfect includes:
 - spwm
 - 485
 - usb
+- usb sido
 - usb flash
 - flash
 - iap
 - picture
-- demo
 
 
