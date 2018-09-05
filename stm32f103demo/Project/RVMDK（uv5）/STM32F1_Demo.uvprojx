@@ -618,6 +618,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\User\bsp\dwt_delay\core_delay.c</FilePath>
             </File>
+            <File>
+              <FileName>i2c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\bsp\i2c\i2c.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
