@@ -76,7 +76,8 @@ uint32_t CPU_TS_TmrRd(void)
 //  */
 //uint32_t HAL_GetTick(void)
 //{        
-//  return ((uint32_t)DWT_CYCCNT*1000/SysClockFreq);
+//    //ÏÈ³ýºó³Ë£¬·ÀÖ¹Òç³ö
+//  return ((uint32_t)DWT_CYCCNT/SysClockFreq*1000);
 //}
 
 /**

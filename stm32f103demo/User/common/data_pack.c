@@ -181,7 +181,7 @@ err_t Usart_Send_Data(uint8_t *buf, uint16_t len)
   * @github  https://github.com/jiejieTop
   * @date    2018-xx-xx
   * @version v1.0
-  * @note    不使用串口 DMA 接收时调用的函数
+  * @note    使用串口 DMA 接收时调用的函数
   ***********************************************************/
 #if USE_USART_DMA_RX
 void Receive_DataPack(void)
@@ -218,11 +218,11 @@ void Receive_DataPack(void)
 	DMA 开启，等待数据。注意，如果中断发送数据帧的速率很快，MCU来不及处理此次接收到的数据，
 	中断又发来数据的话，这里不能开启，否则数据会被覆盖。有2种方式解决：
 
-	1. 在重新开启接收DMA通道之前，将LumMod_Rx_Buf缓冲区里面的数据复制到另外一个数组中，
-	然后再开启DMA，然后马上处理复制出来的数据。
+  1. 在重新开启接收DMA通道之前，将Rx_Buf缓冲区里面的数据复制到另外一个数组中，
+  然后再开启DMA，然后马上处理复制出来的数据。
 
-	2. 建立双缓冲，在LumMod_Uart_DMA_Rx_Data函数中，重新配置DMA_MemoryBaseAddr 的缓冲区地址，
-	那么下次接收到的数据就会保存到新的缓冲区中，不至于被覆盖。
+  2. 建立双缓冲，重新配置DMA_MemoryBaseAddr的缓冲区地址，那么下次接收到的数据就会
+  保存到新的缓冲区中，不至于被覆盖。
 	*/
 }
 #else
