@@ -39,12 +39,12 @@ extern "C" {
 
 typedef struct ringbuff 
 {
-	uint8_t *buffer;  	/* the buffer holding the data */
-	uint32_t size;      /* the size of the allocated buffer */
-	uint32_t in;        /* data is added at offset (in % size) */
-	uint32_t out;       /* data is extracted from off. (out % size) */
+	uint8_t *buffer;  	/* 数据区域 */
+	uint32_t size;      /* 环形缓冲区大小 */
+	uint32_t in;        /* 数据入队指针 (in % size) */
+	uint32_t out;       /* 数据出队指针 (out % size) */
 #if USE_MUTEX
-	MUTEX_T *mutex;       /* protects concurrent modifications */
+	MUTEX_T *mutex;       /* 支持rtos的互斥 */
 #endif
 }RingBuff_t ;
 

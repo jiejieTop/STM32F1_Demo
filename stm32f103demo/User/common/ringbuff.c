@@ -308,21 +308,24 @@ uint32_t Write_RingBuff(RingBuff_t *rb,
     PRINT_DEBUG("request mutex fail!");
     return 0;
   }
+  else  /* 获取互斥量成功 */
+  {
 #endif
-  len = min(len, rb->size - rb->in + rb->out);
+    len = min(len, rb->size - rb->in + rb->out);
 
-  /* 第一部分的拷贝:从环形缓冲区写入数据直至缓冲区最后一个地址 */
-  l = min(len, rb->size - (rb->in & (rb->size - 1)));
-  memcpy(rb->buffer + (rb->in & (rb->size - 1)), wbuff, l);
+    /* 第一部分的拷贝:从环形缓冲区写入数据直至缓冲区最后一个地址 */
+    l = min(len, rb->size - (rb->in & (rb->size - 1)));
+    memcpy(rb->buffer + (rb->in & (rb->size - 1)), wbuff, l);
 
-  /* 如果溢出则在缓冲区头写入剩余的部分
-     如果没溢出这句代码相当于无效 */
-  memcpy(rb->buffer, wbuff + l, len - l);
+    /* 如果溢出则在缓冲区头写入剩余的部分
+       如果没溢出这句代码相当于无效 */
+    memcpy(rb->buffer, wbuff + l, len - l);
 
-  rb->in += len;
-  
-  PRINT_DEBUG("write ringBuff len is %d!",len);
+    rb->in += len;
+    
+    PRINT_DEBUG("write ringBuff len is %d!",len);
 #if USE_MUTEX
+  }
   /* 释放互斥量 */
   release_mutex(rb->mutex);
 #endif
@@ -354,21 +357,24 @@ uint32_t Read_RingBuff(RingBuff_t *rb,
     PRINT_DEBUG("request mutex fail!");
     return 0;
   }
+  else
+  {
 #endif
-  len = min(len, rb->in - rb->out);
+    len = min(len, rb->in - rb->out);
 
-  /* 第一部分的拷贝:从环形缓冲区读取数据直至缓冲区最后一个 */
-  l = min(len, rb->size - (rb->out & (rb->size - 1)));
-  memcpy(rbuff, rb->buffer + (rb->out & (rb->size - 1)), l);
+    /* 第一部分的拷贝:从环形缓冲区读取数据直至缓冲区最后一个 */
+    l = min(len, rb->size - (rb->out & (rb->size - 1)));
+    memcpy(rbuff, rb->buffer + (rb->out & (rb->size - 1)), l);
 
-  /* 如果溢出则在缓冲区头读取剩余的部分
-     如果没溢出这句代码相当于无效 */
-  memcpy(rbuff + l, rb->buffer, len - l);
+    /* 如果溢出则在缓冲区头读取剩余的部分
+       如果没溢出这句代码相当于无效 */
+    memcpy(rbuff + l, rb->buffer, len - l);
 
-  rb->out += len;
-	
-	PRINT_DEBUG("read ringBuff len is %d!",len);
+    rb->out += len;
+    
+    PRINT_DEBUG("read ringBuff len is %d!",len);
 #if USE_MUTEX
+  }
   /* 释放互斥量 */
   release_mutex(rb->mutex);
 #endif
