@@ -623,6 +623,16 @@
               <FileType>1</FileType>
               <FilePath>..\..\User\bsp\i2c\i2c.c</FilePath>
             </File>
+            <File>
+              <FileName>button.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\common\button.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_key.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\bsp\key\bsp_key.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

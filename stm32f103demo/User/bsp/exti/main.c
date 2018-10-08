@@ -29,7 +29,9 @@ static void BSP_Init(void);
   ******************************************************************
   */ 
 	
-	
+
+  Button_t* test_button = NULL;
+    
 /**
   ******************************************************************
   * @brief   Ö÷º¯Êý
@@ -40,6 +42,9 @@ static void BSP_Init(void);
   */ 
 int main(void)
 {
+  
+
+  
   uint8_t ABC[] = "aaaaaa";
 	BSP_Init();
 	while(1)                            

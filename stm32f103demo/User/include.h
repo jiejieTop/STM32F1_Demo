@@ -34,13 +34,11 @@
 
 #include "./i2c/i2c.h"
 
-/* include 数据处理相关文件 */
+/* 包含通用处理相关文件 */
 #include "./common/data_pack.h"
 #include "./common/data_process.h"
 #include "./common/ringbuff.h"
-
-
-
+#include "./common/button.h"
 
 
 #endif /* __INCLUDE_H */

@@ -82,6 +82,28 @@ void Int2Str(int32_t num,char *ptr)
     *ptr++ = str[j];
 }
 
+char *StrCopy(char *dst, const char *src, ubase_t n)
+{
+    if (n != 0)
+    {
+        char *d = dst;
+        const char *s = src;
+
+        do
+        {
+            if ((*d++ = *s++) == 0)
+            {
+                /* NUL pad the remaining n-1 bytes */
+                while (--n != 0)
+                    *d++ = 0;
+                break;
+            }
+        } while (--n != 0);
+    }
+
+    return (dst);
+}
+
 
 /************************************************************
                 以下是内部调用函数
