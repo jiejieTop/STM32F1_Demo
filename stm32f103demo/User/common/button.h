@@ -18,7 +18,6 @@ typedef enum {
   BUTTON_DOWM = 0,
   BUTTON_UP,
   BUTTON_DOUBLE,
-  BUTTON_THREE,
   BUTTON_LONG,
   number_of_event, /* 触发回调的事件 */
   NONE_TRIGGER
@@ -127,9 +126,7 @@ void TestBtn_CallBack(void)
 void Button_Create(const char *name,
                   struct Button_t *btn, 
                   uint8_t(*read_btn_level)(void),
-                  uint8_t btn_trigger_level, 
-                  Button_Event btn_event,
-                  Button_CallBack btn_callback);
+                  uint8_t btn_trigger_level);
                   
                   
 #endif

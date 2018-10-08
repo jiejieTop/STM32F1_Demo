@@ -32,10 +32,10 @@ static void Print_Btn_Info(Button_t* btn);
 
 /************************************************************
   * @brief   按键创建
+	* @param   name : 按键名称
 	* @param   btn : 按键结构体
   * @param   read_btn_level : 按键电平读取函数，需要用户自己实现返回uint8_t类型的电平
   * @param   btn_trigger_level : 按键触发电平
-  * @param   btn_callback : 按键触发之后的回调处理函数。需要用户实现
   * @return  NULL
   * @author  jiejie
   * @github  https://github.com/jiejieTop
@@ -46,9 +46,7 @@ static void Print_Btn_Info(Button_t* btn);
 void Button_Create(const char *name,
                   struct Button_t *btn, 
                   uint8_t(*read_btn_level)(void),
-                  uint8_t btn_trigger_level, 
-                  Button_Event btn_event,
-                  Button_CallBack btn_callback)
+                  uint8_t btn_trigger_level)
 {
   if( btn == NULL)
   {
@@ -65,13 +63,36 @@ void Button_Create(const char *name,
   btn->Read_Button_Level = read_btn_level;    //按键读电平函数
   btn->Button_Trigger_Level = btn_trigger_level;  //按键触发电平
   btn->Button_Current_Level = btn->Read_Button_Level(); //按键当前电平
-  btn->CallBack_Function[btn_event] = btn_callback; //按键事件触发的回调函数，用于处理按键事件
-  
+
   btn->Debounce_Time = 0;
   
   PRINT_DEBUG("button create success!");
   Print_Btn_Info(btn);
 }
+
+/************************************************************
+  * @brief   按键触发事件与回调函数映射链接起来
+	* @param   btn : 按键结构体
+	* @param   btn_event : 按键结触发事件
+  * @param   btn_callback : 按键触发之后的回调处理函数。需要用户实现
+  * @return  NULL
+  * @author  jiejie
+  * @github  https://github.com/jiejieTop
+  * @date    2018-xx-xx
+  * @version v1.0
+  ***********************************************************/
+void Button_Attach(struct Button_t *btn,Button_Event btn_event,Button_CallBack btn_callback)
+{
+  if( btn == NULL)
+  {
+    PRINT_ERR("struct button is null!");
+    ASSERT(ASSERT_ERR);
+  }
+  btn->CallBack_Function[btn_event] = btn_callback; //按键事件触发的回调函数，用于处理按键事件
+}
+
+
+
 
 /************************************************************
   * @brief   获取按键触发的事件
@@ -100,6 +121,8 @@ uint8_t Get_Button_State(struct Button_t *btn)
 {
   return (uint8_t)(btn->Button_State);
 }
+
+
 
 
 
