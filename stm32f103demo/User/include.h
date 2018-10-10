@@ -39,7 +39,7 @@
 #include "./common/data_process.h"
 #include "./common/ringbuff.h"
 #include "./common/button.h"
-
+#include "./common/PID_Control.h"
 
 #endif /* __INCLUDE_H */
 

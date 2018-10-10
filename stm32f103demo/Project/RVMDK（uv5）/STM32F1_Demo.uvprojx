@@ -633,6 +633,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\User\bsp\key\bsp_key.c</FilePath>
             </File>
+            <File>
+              <FileName>PID_Control.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\common\PID_Control.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

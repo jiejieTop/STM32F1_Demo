@@ -42,16 +42,19 @@ static void BSP_Init(void);
   */ 
 int main(void)
 {
+  uint8_t name[] = "≤ÃΩ‹°¢Œ‚Ω®≤®°¢“∂µ¬¡·\n";
   
-
-  
-  uint8_t ABC[] = "aaaaaa";
 	BSP_Init();
+  
+  memcpy(Usart_Tx_Buf,name,sizeof(name));
+  
+  DMA_Send_Data(sizeof(name)-1);
+  
 	while(1)                            
 	{
-    Send_DataPack(ABC,sizeof(ABC));
-		LED1_TOGGLE;
-		Delay_ms(500);
+//    Send_DataPack(ABC,sizeof(ABC));
+////		LED1_TOGGLE;
+//		Delay_ms(500);
 	}
 }
 

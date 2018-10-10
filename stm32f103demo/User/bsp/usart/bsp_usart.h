@@ -16,7 +16,7 @@
 #define  USE_USART_DMA_RX  	1
 
 /* 使用串口DMA发送 */
-#define  USE_USART_DMA_TX 	0
+#define  USE_USART_DMA_TX 	1
 
 #if USE_USART_DMA_RX  
 // 串口对应的DMA请求通道
