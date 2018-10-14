@@ -131,11 +131,8 @@ void Button_Cycle_Process(Button_t *btn)
   
   if((current_level != btn->Button_Last_Level)&&(++(btn->Debounce_Time) >= BUTTON_DEBOUNCE_TIME)) //按键电平发生变化，消抖
   {
-      PRINT_DEBUG("current_level = %d",current_level);
-      PRINT_DEBUG("Button_Last_Level = %d",btn->Button_Last_Level);
-      
       btn->Button_Last_Level = current_level; //更新当前按键电平
-      btn->Debounce_Time = 0; //确定了是按下
+      btn->Debounce_Time = 0;                 //确定了是按下
       
       //如果按键是没被按下的，改变按键状态为按下(首次按下)
       if(btn->Button_State == NONE_TRIGGER)
@@ -149,9 +146,6 @@ void Button_Cycle_Process(Button_t *btn)
         btn->Button_State = BUTTON_UP;
         PRINT_DEBUG("释放了按键");
       }
-      
-      PRINT_DEBUG("计时btn->Timer_Count = %d",btn->Timer_Count);
-      PRINT_DEBUG("btn->Button_State = %d",btn->Button_State);
   }
   
   switch(btn->Button_State)
@@ -163,20 +157,18 @@ void Button_Cycle_Process(Button_t *btn)
         btn->Button_Trigger_Event = BUTTON_DOWM;
         
         #if CONTINUOS_TRIGGER     //支持连续触发
-        
         if(++(btn->Button_Cycle) >= BUTTON_CYCLE)
         {
           btn->Button_Cycle = 0;
           TRIGGER_CB(BUTTON_DOWM);    //连按
-          PRINT_DEBUG("连按Button_Trigger_Event = %d",btn->Button_Trigger_Event);
+          PRINT_DEBUG("连按");
         }
-        
         #endif
         
         if(++(btn->Long_Time) >= BUTTON_LONG_TIME)  //释放按键前更新触发事件为长按
         {
           btn->Button_Trigger_Event = BUTTON_LONG; 
-          PRINT_DEBUG("长按:Button_Trigger_Event = %d",btn->Button_Trigger_Event);
+          PRINT_DEBUG("长按");
         }
         
       }
@@ -191,15 +183,12 @@ void Button_Cycle_Process(Button_t *btn)
     case BUTTON_UP :
     {
       btn->Timer_Count++;     //时间记录
-
-      PRINT_DEBUG("触发事件：Button_Trigger_Event = %d",btn->Button_Trigger_Event);
       
       if(btn->Button_Trigger_Event == BUTTON_DOWM)  //按下单击
       {
         // 双击
         if((btn->Timer_Count <= BUTTON_DOUBLE_TIME)&&(btn->Button_Last_State == BUTTON_DOWM))
         {
-          PRINT_INFO("计时btn->Timer_Count = %d",btn->Timer_Count);
           TRIGGER_CB(BUTTON_DOUBLE);    
           PRINT_INFO("双击");
           btn->Button_State = NONE_TRIGGER;
