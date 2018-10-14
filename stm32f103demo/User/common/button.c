@@ -182,15 +182,13 @@ void Button_Cycle_Process(Button_t *btn)
     
     case BUTTON_UP :
     {
-      btn->Timer_Count++;     //时间记录
-      
       if(btn->Button_Trigger_Event == BUTTON_DOWM)  //按下单击
       {
         // 双击
         if((btn->Timer_Count <= BUTTON_DOUBLE_TIME)&&(btn->Button_Last_State == BUTTON_DOWM))
         {
           TRIGGER_CB(BUTTON_DOUBLE);    
-          PRINT_INFO("双击");
+          PRINT_DEBUG("双击");
           btn->Button_State = NONE_TRIGGER;
           btn->Button_Last_State = NONE_TRIGGER;
         }
@@ -240,11 +238,11 @@ void Button_Process_CallBack(void)
 static void Print_Btn_Info(Button_t* btn)
 {
   
-  PRINT_INFO("button struct information:\n \
-              btn->Name:%s \n \
-              btn->Button_State:%d \n \
-              btn->Button_Trigger_Event:%d \n \
-              btn->Button_Trigger_Level:%d \n \
+  PRINT_INFO("button struct information:\n\
+              btn->Name:%s \n\
+              btn->Button_State:%d \n\
+              btn->Button_Trigger_Event:%d \n\
+              btn->Button_Trigger_Level:%d \n\
               btn->Button_Last_Level:%d \n\
               ",
               btn->Name,
@@ -253,10 +251,6 @@ static void Print_Btn_Info(Button_t* btn)
               btn->Button_Trigger_Level,
               btn->Button_Last_Level);
 }
-
-
-
-
 
 
 

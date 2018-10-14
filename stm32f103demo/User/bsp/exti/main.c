@@ -23,15 +23,36 @@
   */ 
 static void BSP_Init(void);
 
-void TestBtn_CallBack(void *btn)
+void Btn1_Dowm_CallBack(void *btn)
 {
-  PRINT_INFO("按键单击!");
+  PRINT_INFO("1按键单击!");
 }
 
-void TestBtn1_CallBack(void *btn)
+void Btn1_Double_CallBack(void *btn)
 {
-  PRINT_INFO("按键长按!");
+  PRINT_INFO("1按键双击!");
 }
+
+void Btn1_Long_CallBack(void *btn)
+{
+  PRINT_INFO("1按键长按!");
+}
+
+void Btn2_Dowm_CallBack(void *btn)
+{
+  PRINT_INFO("2按键单击!");
+}
+
+void Btn2_Double_CallBack(void *btn)
+{
+  PRINT_INFO("2按键双击!");
+}
+
+void Btn2_Long_CallBack(void *btn)
+{
+  PRINT_INFO("2按键长按!");
+}
+
 /**
   ******************************************************************
 													   变量声明
@@ -40,7 +61,7 @@ void TestBtn1_CallBack(void *btn)
 	
 
 Button_t test_button;
-    
+Button_t test2_button; 
 /**
   ******************************************************************
   * @brief   主函数
@@ -60,13 +81,23 @@ int main(void)
             &test_button, 
             Read_KEY1_Level, 
             KEY_ON);
-  Button_Attach(&test_button,BUTTON_DOWM,TestBtn_CallBack);
-  Button_Attach(&test_button,BUTTON_LONG,TestBtn1_CallBack);
- 
+  Button_Attach(&test_button,BUTTON_DOWM,Btn1_Dowm_CallBack);
+  Button_Attach(&test_button,BUTTON_ALL_RIGGER,Btn1_Double_CallBack);
+  Button_Attach(&test_button,BUTTON_LONG,Btn1_Long_CallBack);
+  
+  Button_Create("test2_button",
+            &test2_button, 
+            Read_KEY2_Level, 
+            KEY_ON);
+  Button_Attach(&test2_button,BUTTON_DOWM,Btn2_Dowm_CallBack);
+  Button_Attach(&test2_button,BUTTON_ALL_RIGGER,Btn2_Double_CallBack);
+  Button_Attach(&test2_button,BUTTON_LONG,Btn2_Long_CallBack);
+  
+  
 	while(1)                            
 	{
     Button_Cycle_Process(&test_button);
-
+    Button_Cycle_Process(&test2_button);
 		Delay_ms(20);
 	}
 }
