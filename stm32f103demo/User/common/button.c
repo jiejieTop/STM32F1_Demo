@@ -44,11 +44,11 @@ void Button_Create(const char *name,
   
   
   btn->Button_State = NONE_TRIGGER;           //按键状态
+  btn->Button_Last_State = NONE_TRIGGER;      //按键上一次状态
   btn->Button_Trigger_Event = NONE_TRIGGER;   //按键触发事件
   btn->Read_Button_Level = read_btn_level;    //按键读电平函数
   btn->Button_Trigger_Level = btn_trigger_level;  //按键触发电平
   btn->Button_Last_Level = btn->Read_Button_Level(); //按键当前电平
-//  btn->Button_Last_Level = !btn_trigger_level; //按键当前电平
   btn->Debounce_Time = 0;
   
   PRINT_DEBUG("button create success!");
@@ -138,11 +138,10 @@ void Button_Cycle_Process(Button_t *btn)
       btn->Debounce_Time = 0; //确定了是按下
       
       //如果按键是没被按下的，改变按键状态为按下(首次按下)
-      if(btn->Button_State == NONE_TRIGGER) 
+      if(btn->Button_State == NONE_TRIGGER)
       {
-        btn->Button_State = BUTTON_DOWM;
-        btn->Timer_Count = 0;
-        PRINT_DEBUG("首次按下");
+          btn->Button_State = BUTTON_DOWM;
+          PRINT_DEBUG("首次按下");
       }
       //释放按键
       else if(btn->Button_State == BUTTON_DOWM)
@@ -150,12 +149,8 @@ void Button_Cycle_Process(Button_t *btn)
         btn->Button_State = BUTTON_UP;
         PRINT_DEBUG("释放了按键");
       }
-      // 双击
-      else if((btn->Timer_Count<BUTTON_DOUBLE_TIME) && (btn->Button_State == BUTTON_UP))
-      {
-        TRIGGER_CB(BUTTON_DOUBLE);    
-        btn->Button_State = NONE_TRIGGER;
-      }
+      
+      PRINT_DEBUG("计时btn->Timer_Count = %d",btn->Timer_Count);
       PRINT_DEBUG("btn->Button_State = %d",btn->Button_State);
   }
   
@@ -177,8 +172,6 @@ void Button_Cycle_Process(Button_t *btn)
         }
         
         #endif
-        
-        btn->Timer_Count++;     //时间记录
         
         if(++(btn->Long_Time) >= BUTTON_LONG_TIME)  //释放按键前更新触发事件为长按
         {
@@ -203,26 +196,43 @@ void Button_Cycle_Process(Button_t *btn)
       
       if(btn->Button_Trigger_Event == BUTTON_DOWM)  //按下单击
       {
-        btn->Long_Time = 0;   //检测长按失败，清0
-        
-        TRIGGER_CB(BUTTON_DOWM);    //单击
-        btn->Button_State = NONE_TRIGGER;
+        // 双击
+        if((btn->Timer_Count <= BUTTON_DOUBLE_TIME)&&(btn->Button_Last_State == BUTTON_DOWM))
+        {
+          PRINT_INFO("计时btn->Timer_Count = %d",btn->Timer_Count);
+          TRIGGER_CB(BUTTON_DOUBLE);    
+          PRINT_INFO("双击");
+          btn->Button_State = NONE_TRIGGER;
+          btn->Button_Last_State = NONE_TRIGGER;
+        }
+        else
+        {
+          btn->Timer_Count=0;
+          btn->Long_Time = 0;   //检测长按失败，清0
+          TRIGGER_CB(BUTTON_DOWM);    //单击
+          btn->Button_State = NONE_TRIGGER;
+          btn->Button_Last_State = BUTTON_DOWM;
+        }
       }
+      
       else if(btn->Button_Trigger_Event == BUTTON_LONG)
       {
         TRIGGER_CB(BUTTON_LONG);    //长按
         btn->Long_Time = 0;
         btn->Button_State = NONE_TRIGGER;
+        btn->Button_Last_State = BUTTON_LONG;
       } 
       break;
     }
     
     case NONE_TRIGGER :
     {
-      btn->Timer_Count = 0;
+      btn->Timer_Count++;     //时间记录
       break;
     }
     
+    default :
+      break;
   }
   
 }

@@ -9,11 +9,11 @@
  只有连续检测到30ms状态不变才认为有效，包括弹起和按下两种事件
 */
 
-#define CONTINUOS_TRIGGER     1  //是否支持连续触发 	
+#define CONTINUOS_TRIGGER     0  //是否支持连续触发 	
 
 #define BUTTON_DEBOUNCE_TIME 	2   //消抖时间      2*调用周期
-#define BUTTON_CYCLE          2	//连按触发时间  2*调用周期  
-#define BUTTON_DOUBLE_TIME    20 	//双击间隔时间  20*调用周期  建议在300-700ms
+#define BUTTON_CYCLE          2	 //连按触发时间  2*调用周期  
+#define BUTTON_DOUBLE_TIME    30 	//双击间隔时间  20*调用周期  建议在300-700ms
 #define BUTTON_LONG_TIME 	    50		/* 持续1秒(50*调用周期)，认为长按事件 */
 
 #define TRIGGER_CB(event)   \
@@ -49,18 +49,17 @@ typedef struct button
 	uint8_t Button_State              :   3;	  /* 按键当前状态（按下还是弹起） */
   uint8_t Button_Trigger_Level      :   1;    /* 按键触发电平 */
   uint8_t Button_Last_Level         :   1;    /* 按键当前电平 */
-
+  
+  uint8_t Button_Last_State;      /* 上一次的按键状态，用于判断双击 */
+  
   Button_CallBack CallBack_Function[number_of_event];
   
-	uint8_t Button_Cycle;	    /* 连续按键周期 */
-//	uint8_t Button_Cycle_Count;	/* 连续按键计数器 */
+	uint8_t Button_Cycle;	           /* 连续按键周期 */
   
+  uint8_t Timer_Count;			/* 计时 */
+	uint8_t Debounce_Time;		/* 消抖时间 */
   
-  
-  uint8_t Timer_Count;			/* 按键时间 */
-	uint8_t Debounce_Time;		/* 消抖时间(最大255,表示2550ms) */
-//	uint16_t Long_Count;		/* 长按计数器 */
-	uint8_t Long_Time;		  /* 按键按下持续时间, 0表示不检测长按 */
+	uint8_t Long_Time;		  /* 按键按下持续时间 */
   
 }Button_t;
 
@@ -80,12 +79,14 @@ void TestBtn_CallBack(void)
   printf("按键按下!\n");
 }
 
-     Button_Create("test_button",
-                  test_button, 
-                  Read_TestBtn_Level,
-                  1, 
-                  BUTTON_DOWM,
-                  TestBtn_CallBack);
+  Button_Create("test_button",
+            &test_button, 
+            Read_TestBtn_Level, 
+            KEY_ON);
+  Button_Attach(&test_button,BUTTON_DOWM,TestBtn_CallBack);
+  Button_Attach(&test_button,BUTTON_LONG,TestBtn1_CallBack);
+  ......
+  
   ***********************************************************/
 void Button_Create(const char *name,
                   Button_t *btn, 
