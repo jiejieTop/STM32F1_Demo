@@ -23,6 +23,15 @@
   */ 
 static void BSP_Init(void);
 
+void TestBtn_CallBack(void *btn)
+{
+  PRINT_INFO("按键单击!");
+}
+
+void TestBtn1_CallBack(void *btn)
+{
+  PRINT_INFO("按键长按!");
+}
 /**
   ******************************************************************
 													   变量声明
@@ -30,7 +39,7 @@ static void BSP_Init(void);
   */ 
 	
 
-  Button_t* test_button = NULL;
+Button_t test_button;
     
 /**
   ******************************************************************
@@ -42,19 +51,23 @@ static void BSP_Init(void);
   */ 
 int main(void)
 {
-  uint8_t name[] = "蔡杰、吴建波、叶德玲\n";
-  
+
 	BSP_Init();
   
-  memcpy(Usart_Tx_Buf,name,sizeof(name));
+//  PRINT_DEBUG("当前电平：%d",Key_Scan(KEY1_GPIO_PORT,KEY1_GPIO_PIN));
   
-  DMA_Send_Data(sizeof(name)-1);
-  
+  Button_Create("test_button",
+            &test_button, 
+            Read_KEY1_Level, 
+            KEY_ON);
+  Button_Attach(&test_button,BUTTON_DOWM,TestBtn_CallBack);
+  Button_Attach(&test_button,BUTTON_LONG,TestBtn1_CallBack);
+ 
 	while(1)                            
 	{
-//    Send_DataPack(ABC,sizeof(ABC));
-////		LED1_TOGGLE;
-//		Delay_ms(500);
+    Button_Cycle_Process(&test_button);
+
+		Delay_ms(20);
 	}
 }
 
@@ -81,9 +94,12 @@ static void BSP_Init(void)
 	
 	/* 串口初始化 */
 	USART_Config();
-	
-	/* 外部中断初始化 */
-	EXTI_Key_Config(); 
+  
+	/* 按键初始化 */
+  Key_GPIO_Config();
+  
+//	/* 外部中断初始化 */
+//	EXTI_Key_Config(); 
 	
 	CRC_Config();
 	

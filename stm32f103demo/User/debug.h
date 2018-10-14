@@ -12,9 +12,9 @@
 * @name Debug print 
 * @{
 */
-#define PRINT_DEBUG_ENABLE		1		/* 打印调试信息 */
+#define PRINT_DEBUG_ENABLE		0		/* 打印调试信息 */
 #define PRINT_ERR_ENABLE			1 	/* 打印错误信息 */
-#define PRINT_INFO_ENABLE			0		/* 打印个人信息 */
+#define PRINT_INFO_ENABLE			1		/* 打印个人信息 */
 
 
 #if PRINT_DEBUG_ENABLE

@@ -96,7 +96,7 @@ void CPU_TS_Tmr_Delay_US(__IO uint32_t us)
   /* 在函数内部初始化时间戳寄存器， */  
 #if (CPU_TS_INIT_IN_DELAY_FUNCTION)  
   /* 初始化时间戳并清零 */
-  HAL_InitTick(5);
+  CPU_TS_TmrInit();
 #endif
   
   ticks = us * (GET_CPU_ClkFreq() / 1000000);  /* 需要的节拍数 */      

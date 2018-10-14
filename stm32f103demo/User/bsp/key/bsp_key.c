@@ -65,6 +65,15 @@ uint8_t Key_Scan(GPIO_TypeDef* GPIOx,uint16_t GPIO_Pin)
 }
 
 
+uint8_t Read_KEY1_Level(void)
+{
+  return GPIO_ReadInputDataBit(KEY1_GPIO_PORT,KEY1_GPIO_PIN);
+}
+
+uint8_t Read_KEY2_Level(void)
+{
+  return GPIO_ReadInputDataBit(KEY2_GPIO_PORT,KEY2_GPIO_PIN);
+}
 
 
 /*********************************************END OF FILE**********************/

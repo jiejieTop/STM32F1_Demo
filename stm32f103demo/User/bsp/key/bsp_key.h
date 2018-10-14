@@ -11,7 +11,8 @@
 
 #define    KEY2_GPIO_CLK     RCC_APB2Periph_GPIOC
 #define    KEY2_GPIO_PORT    GPIOC		   
-#define    KEY2_GPIO_PIN		  GPIO_Pin_13
+#define    KEY2_GPIO_PIN		 GPIO_Pin_13
+
 
 
  /** 按键按下标置宏
@@ -24,6 +25,8 @@
 void Key_GPIO_Config(void);
 uint8_t Key_Scan(GPIO_TypeDef* GPIOx,uint16_t GPIO_Pin);
 
+uint8_t Read_KEY1_Level(void);
+uint8_t Read_KEY2_Level(void);
 
 #endif /* __KEY_H */
 

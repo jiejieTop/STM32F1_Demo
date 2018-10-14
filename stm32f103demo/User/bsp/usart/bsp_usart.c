@@ -202,8 +202,8 @@ static void USARTx_DMA_Tx_Config(void)
 		// 内存数据单位
 		DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;	 
 		// DMA模式，一次或者循环模式
-//		DMA_InitStructure.DMA_Mode = DMA_Mode_Normal ;
-		DMA_InitStructure.DMA_Mode = DMA_Mode_Circular;	
+		DMA_InitStructure.DMA_Mode = DMA_Mode_Normal ;
+//		DMA_InitStructure.DMA_Mode = DMA_Mode_Circular;	
 		// 优先级：中	
 		DMA_InitStructure.DMA_Priority = DMA_Priority_Medium; 
 		// 禁止内存到内存的传输
