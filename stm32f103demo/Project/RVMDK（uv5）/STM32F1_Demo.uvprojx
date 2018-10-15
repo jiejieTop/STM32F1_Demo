@@ -546,7 +546,7 @@
             <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\User\bsp\exti\main.c</FilePath>
+              <FilePath>..\..\User\main.c</FilePath>
             </File>
             <File>
               <FileName>include.h</FileName>
