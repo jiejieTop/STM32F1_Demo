@@ -10,8 +10,19 @@
   ***********************************************************/
 #include "./common/button.h"
 
-static void Print_Btn_Info(Button_t* btn);
+/*******************************************************************
+ *                          变量声明                               
+ *******************************************************************/
 
+static struct button* Head_Button = NULL;
+
+
+/*******************************************************************
+ *                         函数声明     
+ *******************************************************************/
+ 
+static void Print_Btn_Info(Button_t* btn);
+static void Add_Button(Button_t* btn);
 
 
 /************************************************************
@@ -52,7 +63,11 @@ void Button_Create(const char *name,
   btn->Debounce_Time = 0;
   
   PRINT_DEBUG("button create success!");
-  Print_Btn_Info(btn);
+  
+  Add_Button(btn);          //创建的时候添加到单链表中
+  
+  Print_Btn_Info(btn);     //打印信息
+ 
 }
 
 /************************************************************
@@ -71,7 +86,7 @@ void Button_Attach(Button_t *btn,Button_Event btn_event,Button_CallBack btn_call
   if( btn == NULL)
   {
     PRINT_ERR("struct button is null!");
-    ASSERT(ASSERT_ERR);
+    ASSERT(ASSERT_ERR);       //断言
   }
   
   if(BUTTON_ALL_RIGGER == btn_event)
@@ -82,9 +97,36 @@ void Button_Attach(Button_t *btn,Button_Event btn_event,Button_CallBack btn_call
   else
   {
     btn->CallBack_Function[btn_event] = btn_callback; //按键事件触发的回调函数，用于处理按键事件
-
   }
 }
+
+/************************************************************
+  * @brief   删除一个已经创建的按键
+	* @param   NULL
+  * @return  NULL
+  * @author  jiejie
+  * @github  https://github.com/jiejieTop
+  * @date    2018-xx-xx
+  * @version v1.0
+  * @note    NULL
+  ***********************************************************/
+void Button_Delete(Button_t *btn)
+{
+  struct button** curr;
+  for(curr = &Head_Button; *curr;) 
+  {
+    struct button* entry = *curr;
+    if (entry == btn) 
+    {
+      *curr = entry->Next;
+    } 
+    else
+    {
+      curr = &entry->Next;
+    }
+  }
+}
+
 /************************************************************
   * @brief   获取按键触发的事件
 	* @param   NULL
@@ -223,8 +265,56 @@ void Button_Cycle_Process(Button_t *btn)
   }
   
 }
+/************************************************************
+  * @brief   遍历的方式扫描按键，不会丢失每个按键
+	* @param   NULL
+  * @return  NULL
+  * @author  jiejie
+  * @github  https://github.com/jiejieTop
+  * @date    2018-xx-xx
+  * @version v1.0
+  * @note    此函数要周期调用，建议20-50ms调用一次
+  ***********************************************************/
+void Button_Process(void)
+{
+  struct button* pass_btn;
+  for(pass_btn = Head_Button; pass_btn != NULL; pass_btn = pass_btn->Next)
+  {
+      Button_Cycle_Process(pass_btn);
+  }
+}
+
+/************************************************************
+  * @brief   遍历按键
+	* @param   NULL
+  * @return  NULL
+  * @author  jiejie
+  * @github  https://github.com/jiejieTop
+  * @date    2018-xx-xx
+  * @version v1.0
+  * @note    NULL
+  ***********************************************************/
+void Search_Button(void)
+{
+  struct button* pass_btn;
+  for(pass_btn = Head_Button; pass_btn != NULL; pass_btn = pass_btn->Next)
+  {
+    PRINT_INFO("button node have %s",pass_btn->Name);
+  }
+}
 
 
+
+/************************************************************
+  * @brief   处理所有按键回调函数
+	* @param   NULL
+  * @return  NULL
+  * @author  jiejie
+  * @github  https://github.com/jiejieTop
+  * @date    2018-xx-xx
+  * @version v1.0
+  * @note    暂不实现
+  ***********************************************************/
 void Button_Process_CallBack(void)
 {
   ;
@@ -250,7 +340,187 @@ static void Print_Btn_Info(Button_t* btn)
               btn->Button_Trigger_Event,
               btn->Button_Trigger_Level,
               btn->Button_Last_Level);
+  Search_Button();
 }
+/************************************************************
+  * @brief   使用单链表将按键连接起来
+	* @param   NULL
+  * @return  NULL
+  * @author  jiejie
+  * @github  https://github.com/jiejieTop
+  * @date    2018-xx-xx
+  * @version v1.0
+  * @note    NULL
+  ***********************************************************/
+static void Add_Button(Button_t* btn)
+{
+  struct button *pass_btn = Head_Button;
+  
+  while(pass_btn)
+  {
+    pass_btn = pass_btn->Next;
+  }
+  
+  btn->Next = Head_Button;
+  Head_Button = btn;
+}
+
+
+/*************************** 下面是example ******************************************/
+
+///**
+//  ******************************************************************************
+//  * @file    main.c
+//  * @author  jiejie
+//  * @version V1.0
+//  * @date    2018-xx-xx
+//  * @brief   main
+//  ******************************************************************************
+//  * @attention 此demo是无RTOS版本，需要RTOS的demo请关注杰杰的GitHub：
+//  *	GitHub：https://github.com/jiejieTop
+//  *
+//  * 实验平台:野火 F103-霸道 STM32 开发板 
+//  * 论坛    :http://www.firebbs.cn
+//  * 淘宝    :https://fire-stm32.taobao.com
+//  *
+//  ******************************************************************************
+//  */ 
+//#include "include.h"
+
+///**
+//  ******************************************************************
+//													   变量声明
+//  ******************************************************************
+//  */ 
+
+//Button_t Button1;
+//Button_t Button2; 
+
+
+///**
+//  ******************************************************************
+//														函数声明
+//  ******************************************************************
+//  */ 
+//static void BSP_Init(void);
+
+//void Btn1_Dowm_CallBack(void *btn)
+//{
+//  PRINT_INFO("Button1 单击!");
+//}
+
+//void Btn1_Double_CallBack(void *btn)
+//{
+//  PRINT_INFO("Button1 双击!");
+//}
+
+//void Btn1_Long_CallBack(void *btn)
+//{
+//  PRINT_INFO("Button1 长按!");
+//  
+//  Button_Delete(&Button2);
+//  PRINT_INFO("删除Button1");
+//  Search_Button();
+//}
+
+//void Btn2_Dowm_CallBack(void *btn)
+//{
+//  PRINT_INFO("Button2 单击!");
+//}
+
+//void Btn2_Double_CallBack(void *btn)
+//{
+//  PRINT_INFO("Button2 双击!");
+//}
+
+//void Btn2_Long_CallBack(void *btn)
+//{
+//  PRINT_INFO("Button2 长按!");
+//}
+
+
+///**
+//  ******************************************************************
+//  * @brief   主函数
+//  * @author  jiejie
+//  * @version V1.0
+//  * @date    2018-xx-xx
+//  ******************************************************************
+//  */ 
+//int main(void)
+//{
+
+//	BSP_Init();
+//  
+////  PRINT_DEBUG("当前电平：%d",Key_Scan(KEY1_GPIO_PORT,KEY1_GPIO_PIN));
+//  
+//  Button_Create("Button1",
+//                &Button1, 
+//                Read_KEY1_Level, 
+//                KEY_ON);
+//  Button_Attach(&Button1,BUTTON_DOWM,Btn1_Dowm_CallBack);
+//  Button_Attach(&Button1,BUTTON_DOUBLE,Btn1_Double_CallBack);
+//  Button_Attach(&Button1,BUTTON_LONG,Btn1_Long_CallBack);
+//  
+//  Button_Create("Button2",
+//                &Button2, 
+//                Read_KEY2_Level, 
+//                KEY_ON);
+//  Button_Attach(&Button2,BUTTON_DOWM,Btn2_Dowm_CallBack);
+//  Button_Attach(&Button2,BUTTON_DOUBLE,Btn2_Double_CallBack);
+//  Button_Attach(&Button2,BUTTON_LONG,Btn2_Long_CallBack);
+// 
+//	while(1)                            
+//	{
+
+//    Button_Process();     //需要周期调用按键处理函数
+
+//		Delay_ms(20);
+//    
+//    
+//    
+//	}
+//}
+
+///**
+//  ******************************************************************
+//  * @brief   BSP_Init，用于所有板级初始化
+//  * @author  jiejie
+//  * @version V1.0
+//  * @date    2018-xx-xx
+//  ******************************************************************
+//  */ 
+//static void BSP_Init(void)
+//{
+//	/* LED 初始化 */
+//	LED_GPIO_Config();
+//	
+//#if USE_DWT_DELAY
+//	/* 内核精确定时器初始化 */
+//	CPU_TS_TmrInit();
+//#else
+//	/* 滴答定时器初始化 */
+//	SysTick_Init();
+//#endif
+//	
+//	/* 串口初始化 */
+//	USART_Config();
+//  
+//	/* 按键初始化 */
+//  Key_GPIO_Config();
+//  
+////	/* 外部中断初始化 */
+////	EXTI_Key_Config(); 
+//	
+//	CRC_Config();
+//	
+//	/* 打印信息 */
+//	PRINT_INFO("welcome to learn jiejie stm32 library!\n");
+//	
+//}
+
+
+///********************************END OF FILE***************************************/
 
 
 

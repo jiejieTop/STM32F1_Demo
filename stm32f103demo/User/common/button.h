@@ -9,11 +9,11 @@
  只有连续检测到40ms状态不变才认为有效，包括弹起和按下两种事件
 */
 
-#define CONTINUOS_TRIGGER     1  //是否支持连续触发 	
+#define CONTINUOS_TRIGGER     0  //是否支持连续触发 	
 
 #define BUTTON_DEBOUNCE_TIME 	2   //消抖时间      2*调用周期
 #define BUTTON_CYCLE          2	 //连按触发时间  2*调用周期  
-#define BUTTON_DOUBLE_TIME    15 	//双击间隔时间  20*调用周期  建议在200-700ms
+#define BUTTON_DOUBLE_TIME    15 	//双击间隔时间  20*调用周期  建议在200-600ms
 #define BUTTON_LONG_TIME 	    50		/* 持续1秒(50*调用周期)，认为长按事件 */
 
 #define TRIGGER_CB(event)   \
@@ -61,6 +61,9 @@ typedef struct button
   
 	uint8_t Long_Time;		  /* 按键按下持续时间 */
   
+//  struct button *Prve;
+  struct button *Next;
+  
 }Button_t;
 
 
@@ -96,8 +99,15 @@ void Button_Create(const char *name,
 void Button_Attach(Button_t *btn,Button_Event btn_event,Button_CallBack btn_callback);   
                   
 void Button_Cycle_Process(Button_t *btn);   
-
+                  
+void Button_Process(void);
+                  
+void Button_Delete(Button_t *btn);   
+  
+void Search_Button(void);     
+                  
 uint8_t Get_Button_Event(Button_t *btn);
 uint8_t Get_Button_State(Button_t *btn);
-         
+
+                  
 #endif
