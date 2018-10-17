@@ -48,9 +48,9 @@ void Btn1_Long_CallBack(void *btn)
 {
   PRINT_INFO("Button1 ³¤°´!");
   
-  Button_Delete(&Button2);
-  PRINT_INFO("É¾³ýButton1");
-  Search_Button();
+////  Button_Delete(&Button2);
+////  PRINT_INFO("É¾³ýButton1");
+//  Search_Button();
 }
 
 void Btn2_Dowm_CallBack(void *btn)

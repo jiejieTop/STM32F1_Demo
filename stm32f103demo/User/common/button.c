@@ -51,7 +51,7 @@ void Button_Create(const char *name,
   
   memset(btn, 0, sizeof(struct button));  //清除结构体信息，建议用户在之前清除
  
-  StrCopy(btn->Name, name, BTN_NAME_MAX); /* 创建按键名称 */
+  StrnCopy(btn->Name, name, BTN_NAME_MAX); /* 创建按键名称 */
   
   
   btn->Button_State = NONE_TRIGGER;           //按键状态

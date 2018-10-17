@@ -9,7 +9,7 @@
  只有连续检测到40ms状态不变才认为有效，包括弹起和按下两种事件
 */
 
-#define CONTINUOS_TRIGGER     0  //是否支持连续触发 	
+#define CONTINUOS_TRIGGER     1  //是否支持连续触发 	
 
 #define BUTTON_DEBOUNCE_TIME 	2   //消抖时间      2*调用周期
 #define BUTTON_CYCLE          2	 //连按触发时间  2*调用周期  

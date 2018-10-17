@@ -82,26 +82,24 @@ void Int2Str(int32_t num,char *ptr)
     *ptr++ = str[j];
 }
 
-char *StrCopy(char *dst, const char *src, ubase_t n)
+char *StrnCopy(char *dst, const char *src, ubase_t n)
 {
-    if (n != 0)
+  if (n != 0)
+  {
+    char *d = dst;
+    const char *s = src;
+    do
     {
-        char *d = dst;
-        const char *s = src;
-
-        do
+        if ((*d++ = *s++) == 0)
         {
-            if ((*d++ = *s++) == 0)
-            {
-                /* NUL pad the remaining n-1 bytes */
-                while (--n != 0)
-                    *d++ = 0;
-                break;
-            }
-        } while (--n != 0);
-    }
-
-    return (dst);
+            /* NUL pad the remaining n-1 bytes */
+            while (--n != 0)
+                *d++ = 0;
+            break;
+        }
+    } while (--n != 0);
+  }
+  return (dst);
 }
 
 

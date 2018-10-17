@@ -16,6 +16,6 @@
 
 int32_t Str2Int(const char *nptr);
 void Int2Str(int32_t num,char *ptr);
-char *StrCopy(char *dst, const char *src, ubase_t n);
+char *StrnCopy(char *dst, const char *src, ubase_t n);
 
 #endif /* __DATA_PROCESS_H */
