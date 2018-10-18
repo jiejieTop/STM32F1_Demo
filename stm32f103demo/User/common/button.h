@@ -114,7 +114,7 @@ void Button_Delete(Button_t *btn);
   
 void Search_Button(void);     
                   
-uint8_t Get_Button_Event(Button_t *btn);
+void Get_Button_Event(Button_t *btn);
 uint8_t Get_Button_State(Button_t *btn);
 
                   

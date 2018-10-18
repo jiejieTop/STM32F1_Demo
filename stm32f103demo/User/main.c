@@ -93,43 +93,44 @@ void Btn2_ContinuosFree_CallBack(void *btn)
   */ 
 int main(void)
 {
+  BSP_Init();
 
-	BSP_Init();
-  
-//  PRINT_DEBUG("当前电平：%d",Key_Scan(KEY1_GPIO_PORT,KEY1_GPIO_PIN));
-  
+  //  PRINT_DEBUG("当前电平：%d",Key_Scan(KEY1_GPIO_PORT,KEY1_GPIO_PIN));
+
   Button_Create("Button1",
-                &Button1, 
-                Read_KEY1_Level, 
-                KEY_ON);
+              &Button1, 
+              Read_KEY1_Level, 
+              KEY_ON);
   Button_Attach(&Button1,BUTTON_DOWM,Btn1_Dowm_CallBack);                       //单击
   Button_Attach(&Button1,BUTTON_DOUBLE,Btn1_Double_CallBack);                   //双击
   Button_Attach(&Button1,BUTTON_CONTINUOS,Btn1_Continuos_CallBack);             //连按  
   Button_Attach(&Button1,BUTTON_CONTINUOS_FREE,Btn1_ContinuosFree_CallBack);    //连按释放  
   Button_Attach(&Button1,BUTTON_LONG,Btn1_Long_CallBack);                       //长按
-  
-  
+
+
   Button_Create("Button2",
-                &Button2, 
-                Read_KEY2_Level, 
-                KEY_ON);
+              &Button2, 
+              Read_KEY2_Level, 
+              KEY_ON);
   Button_Attach(&Button2,BUTTON_DOWM,Btn2_Dowm_CallBack);                     //单击
   Button_Attach(&Button2,BUTTON_DOUBLE,Btn2_Double_CallBack);                 //双击
   Button_Attach(&Button2,BUTTON_CONTINUOS,Btn2_Continuos_CallBack);           //连按
   Button_Attach(&Button2,BUTTON_CONTINUOS_FREE,Btn2_ContinuosFree_CallBack);  //连按释放
   Button_Attach(&Button2,BUTTON_LONG,Btn2_Long_CallBack);                     //长按
- 
- 
-	while(1)                            
-	{
+
+  Get_Button_Event(&Button1);
+  Get_Button_Event(&Button2);
+  
+  while(1)                            
+  {
 
     Button_Process();     //需要周期调用按键处理函数
 
-		Delay_ms(20);
-    
-    
-    
-	}
+    Delay_ms(20);
+
+
+
+  }
 }
 
 /**

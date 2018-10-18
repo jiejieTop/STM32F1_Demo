@@ -136,9 +136,16 @@ void Button_Delete(Button_t *btn)
   * @date    2018-xx-xx
   * @version v1.0
   ***********************************************************/
-uint8_t Get_Button_Event(Button_t *btn)
+void Get_Button_Event(Button_t *btn)
 {
-  return (uint8_t)(btn->Button_Trigger_Event);
+  //按键事件触发的回调函数，用于处理按键事件
+  for(uint8_t i = 0 ; i < number_of_event-1 ; i++)
+  {
+    if(btn->CallBack_Function[i] != 0)
+    {
+      PRINT_INFO("Button_Event:%d",i);
+    }      
+  } 
 }
 
 /************************************************************
@@ -174,11 +181,10 @@ void Button_Cycle_Process(Button_t *btn)
       btn->Button_Last_Level = current_level; //更新当前按键电平
       btn->Debounce_Time = 0;                 //确定了是按下
       
-      //如果按键是没被按下的，改变按键状态为按下(首次按下)
+      //如果按键是没被按下的，改变按键状态为按下(首次按下/双击按下)
       if((btn->Button_State == NONE_TRIGGER)||(btn->Button_State == BUTTON_DOUBLE))
       {
         btn->Button_State = BUTTON_DOWM;
-        PRINT_DEBUG("首次按下");
       }
       //释放按键
       else if(btn->Button_State == BUTTON_DOWM)

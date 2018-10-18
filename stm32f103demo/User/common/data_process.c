@@ -82,7 +82,7 @@ void Int2Str(int32_t num,char *ptr)
     *ptr++ = str[j];
 }
 
-char *StrnCopy(char *dst, const char *src, ubase_t n)
+char *StrnCopy(char *dst, const char *src, uint32_t n)
 {
   if (n != 0)
   {
@@ -92,7 +92,6 @@ char *StrnCopy(char *dst, const char *src, ubase_t n)
     {
         if ((*d++ = *s++) == 0)
         {
-            /* NUL pad the remaining n-1 bytes */
             while (--n != 0)
                 *d++ = 0;
             break;
