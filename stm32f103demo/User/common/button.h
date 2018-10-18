@@ -65,7 +65,7 @@ typedef struct button
   
 	uint8_t Button_Cycle;	           /* 连续按键周期 */
   
-  uint16_t Timer_Count;			/* 计时 */
+  uint8_t Timer_Count;			/* 计时 */
 	uint8_t Debounce_Time;		/* 消抖时间 */
   
 	uint8_t Long_Time;		  /* 按键按下持续时间 */
