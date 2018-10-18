@@ -47,11 +47,17 @@ void Btn1_Double_CallBack(void *btn)
 void Btn1_Long_CallBack(void *btn)
 {
   PRINT_INFO("Button1 长按!");
-  
-////  Button_Delete(&Button2);
-////  PRINT_INFO("删除Button1");
-//  Search_Button();
 }
+
+void Btn1_Continuos_CallBack(void *btn)
+{
+  PRINT_INFO("Button1 连按!");
+}
+void Btn1_ContinuosFree_CallBack(void *btn)
+{
+  PRINT_INFO("Button1 连按释放!");
+}
+
 
 void Btn2_Dowm_CallBack(void *btn)
 {
@@ -68,6 +74,14 @@ void Btn2_Long_CallBack(void *btn)
   PRINT_INFO("Button2 长按!");
 }
 
+void Btn2_Continuos_CallBack(void *btn)
+{
+  PRINT_INFO("Button2 连按!");
+}
+void Btn2_ContinuosFree_CallBack(void *btn)
+{
+  PRINT_INFO("Button2 连按释放!");
+}
 
 /**
   ******************************************************************
@@ -88,17 +102,23 @@ int main(void)
                 &Button1, 
                 Read_KEY1_Level, 
                 KEY_ON);
-  Button_Attach(&Button1,BUTTON_DOWM,Btn1_Dowm_CallBack);
-  Button_Attach(&Button1,BUTTON_DOUBLE,Btn1_Double_CallBack);
-  Button_Attach(&Button1,BUTTON_LONG,Btn1_Long_CallBack);
+  Button_Attach(&Button1,BUTTON_DOWM,Btn1_Dowm_CallBack);                       //单击
+  Button_Attach(&Button1,BUTTON_DOUBLE,Btn1_Double_CallBack);                   //双击
+  Button_Attach(&Button1,BUTTON_CONTINUOS,Btn1_Continuos_CallBack);             //连按  
+  Button_Attach(&Button1,BUTTON_CONTINUOS_FREE,Btn1_ContinuosFree_CallBack);    //连按释放  
+  Button_Attach(&Button1,BUTTON_LONG,Btn1_Long_CallBack);                       //长按
+  
   
   Button_Create("Button2",
                 &Button2, 
                 Read_KEY2_Level, 
                 KEY_ON);
-  Button_Attach(&Button2,BUTTON_DOWM,Btn2_Dowm_CallBack);
-  Button_Attach(&Button2,BUTTON_DOUBLE,Btn2_Double_CallBack);
-  Button_Attach(&Button2,BUTTON_LONG,Btn2_Long_CallBack);
+  Button_Attach(&Button2,BUTTON_DOWM,Btn2_Dowm_CallBack);                     //单击
+  Button_Attach(&Button2,BUTTON_DOUBLE,Btn2_Double_CallBack);                 //双击
+  Button_Attach(&Button2,BUTTON_CONTINUOS,Btn2_Continuos_CallBack);           //连按
+  Button_Attach(&Button2,BUTTON_CONTINUOS_FREE,Btn2_ContinuosFree_CallBack);  //连按释放
+  Button_Attach(&Button2,BUTTON_LONG,Btn2_Long_CallBack);                     //长按
+ 
  
 	while(1)                            
 	{

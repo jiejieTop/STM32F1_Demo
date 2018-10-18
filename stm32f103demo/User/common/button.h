@@ -9,7 +9,14 @@
  只有连续检测到40ms状态不变才认为有效，包括弹起和按下两种事件
 */
 
-#define CONTINUOS_TRIGGER     1  //是否支持连续触发 	
+#define CONTINUOS_TRIGGER             0  //是否支持连续触发，连发的话就不要检测单双击与长按了	
+
+/* 是否支持单击&双击同时存在触发，如果选择开启宏定义的话，单双击都回调，只不过单击会延迟响应，
+   因为必须判断单击之后是否触发了双击否则，延迟时间是双击间隔时间 BUTTON_DOUBLE_TIME。
+   而如果不开启这个宏定义，建议工程中只存在单击/双击中的一个，否则，在双击响应的时候会触发一次单击，
+   因为双击必须是有一次按下并且释放之后才产生的 */
+#define SINGLE_AND_DOUBLE_TRIGGER     0 
+
 
 #define BUTTON_DEBOUNCE_TIME 	2   //消抖时间      2*调用周期
 #define BUTTON_CYCLE          2	 //连按触发时间  2*调用周期  
@@ -29,6 +36,8 @@ typedef enum {
   BUTTON_UP,
   BUTTON_DOUBLE,
   BUTTON_LONG,
+  BUTTON_CONTINUOS,
+  BUTTON_CONTINUOS_FREE,
   BUTTON_ALL_RIGGER,
   number_of_event, /* 触发回调的事件 */
   NONE_TRIGGER
@@ -44,24 +53,23 @@ typedef struct button
 	uint8_t (*Read_Button_Level)(void); /* 读取按键电平函数，需要用户实现 */
   
   char Name[BTN_NAME_MAX];
+  	
+  uint8_t Button_State              :   4;	  /* 按键当前状态（按下还是弹起） */
+  uint8_t Button_Last_State         :   4;	  /* 上一次的按键状态，用于判断双击 */
+  uint8_t Button_Trigger_Level      :   2;    /* 按键触发电平 */
+  uint8_t Button_Last_Level         :   2;    /* 按键当前电平 */
   
-  uint8_t Button_Trigger_Event      :   3;	  /* 按键触发事件，单击，双击，长按等 */
-	uint8_t Button_State              :   3;	  /* 按键当前状态（按下还是弹起） */
-  uint8_t Button_Trigger_Level      :   1;    /* 按键触发电平 */
-  uint8_t Button_Last_Level         :   1;    /* 按键当前电平 */
-  
-  uint8_t Button_Last_State;      /* 上一次的按键状态，用于判断双击 */
+  uint8_t Button_Trigger_Event;     /* 按键触发事件，单击，双击，长按等 */
   
   Button_CallBack CallBack_Function[number_of_event];
   
 	uint8_t Button_Cycle;	           /* 连续按键周期 */
   
-  uint8_t Timer_Count;			/* 计时 */
+  uint16_t Timer_Count;			/* 计时 */
 	uint8_t Debounce_Time;		/* 消抖时间 */
   
 	uint8_t Long_Time;		  /* 按键按下持续时间 */
   
-//  struct button *Prve;
   struct button *Next;
   
 }Button_t;

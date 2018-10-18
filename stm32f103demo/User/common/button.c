@@ -169,18 +169,16 @@ void Button_Cycle_Process(Button_t *btn)
 {
   uint8_t current_level = (uint8_t)btn->Read_Button_Level();//获取当前按键电平
   
-//  PRINT_DEBUG("1:btn->Button_State = %d",btn->Button_State);
-  
   if((current_level != btn->Button_Last_Level)&&(++(btn->Debounce_Time) >= BUTTON_DEBOUNCE_TIME)) //按键电平发生变化，消抖
   {
       btn->Button_Last_Level = current_level; //更新当前按键电平
       btn->Debounce_Time = 0;                 //确定了是按下
       
       //如果按键是没被按下的，改变按键状态为按下(首次按下)
-      if(btn->Button_State == NONE_TRIGGER)
+      if((btn->Button_State == NONE_TRIGGER)||(btn->Button_State == BUTTON_DOUBLE))
       {
-          btn->Button_State = BUTTON_DOWM;
-          PRINT_DEBUG("首次按下");
+        btn->Button_State = BUTTON_DOWM;
+        PRINT_DEBUG("首次按下");
       }
       //释放按键
       else if(btn->Button_State == BUTTON_DOWM)
@@ -192,42 +190,45 @@ void Button_Cycle_Process(Button_t *btn)
   
   switch(btn->Button_State)
   {
-    case BUTTON_DOWM :
+    case BUTTON_DOWM :            // 按下状态
     {
       if(btn->Button_Last_Level == btn->Button_Trigger_Level) //按键按下
       {
-        btn->Button_Trigger_Event = BUTTON_DOWM;
-        
         #if CONTINUOS_TRIGGER     //支持连续触发
+        
         if(++(btn->Button_Cycle) >= BUTTON_CYCLE)
         {
           btn->Button_Cycle = 0;
-          TRIGGER_CB(BUTTON_DOWM);    //连按
+          btn->Button_Trigger_Event = BUTTON_CONTINUOS; 
+          TRIGGER_CB(BUTTON_CONTINUOS);    //连按
           PRINT_DEBUG("连按");
         }
+ 
+        #else
+        
+          btn->Button_Trigger_Event = BUTTON_DOWM;
+        
+          if(++(btn->Long_Time) >= BUTTON_LONG_TIME)  //释放按键前更新触发事件为长按
+          {
+            btn->Button_Trigger_Event = BUTTON_LONG; 
+            PRINT_DEBUG("长按");
+          }
+        
         #endif
-        
-        if(++(btn->Long_Time) >= BUTTON_LONG_TIME)  //释放按键前更新触发事件为长按
-        {
-          btn->Button_Trigger_Event = BUTTON_LONG; 
-          PRINT_DEBUG("长按");
-        }
-        
+       
       }
-      else    //如果是不支持连按的，检测释放按键
-      {
-        btn->Button_State = BUTTON_UP;
-      }
-
+//      else    //检测释放按键
+//      {
+//        btn->Button_State = BUTTON_UP;
+//      }
       break;
     } 
     
-    case BUTTON_UP :
+    case BUTTON_UP :        // 弹起状态
     {
-      if(btn->Button_Trigger_Event == BUTTON_DOWM)  //按下单击
+      if(btn->Button_Trigger_Event == BUTTON_DOWM)  //触发单击
       {
-        // 双击
-        if((btn->Timer_Count <= BUTTON_DOUBLE_TIME)&&(btn->Button_Last_State == BUTTON_DOWM))
+        if((btn->Timer_Count <= BUTTON_DOUBLE_TIME)&&(btn->Button_Last_State == BUTTON_DOUBLE)) // 双击
         {
           TRIGGER_CB(BUTTON_DOUBLE);    
           PRINT_DEBUG("双击");
@@ -236,11 +237,15 @@ void Button_Cycle_Process(Button_t *btn)
         }
         else
         {
-          btn->Timer_Count=0;
-          btn->Long_Time = 0;   //检测长按失败，清0
-          TRIGGER_CB(BUTTON_DOWM);    //单击
-          btn->Button_State = NONE_TRIGGER;
-          btn->Button_Last_State = BUTTON_DOWM;
+            btn->Timer_Count=0;
+            btn->Long_Time = 0;   //检测长按失败，清0
+          
+          #if (SINGLE_AND_DOUBLE_TRIGGER == 0)
+            TRIGGER_CB(BUTTON_DOWM);    //单击
+          #endif
+            btn->Button_State = BUTTON_DOUBLE;
+            btn->Button_Last_State = BUTTON_DOUBLE;
+          
         }
       }
       
@@ -251,14 +256,45 @@ void Button_Cycle_Process(Button_t *btn)
         btn->Button_State = NONE_TRIGGER;
         btn->Button_Last_State = BUTTON_LONG;
       } 
+      
+      #if CONTINUOS_TRIGGER
+        else if(btn->Button_Trigger_Event == BUTTON_CONTINUOS)  //连按
+        {
+          btn->Long_Time = 0;
+          TRIGGER_CB(BUTTON_CONTINUOS_FREE);    //连发释放
+          btn->Button_State = NONE_TRIGGER;
+          btn->Button_Last_State = BUTTON_CONTINUOS;
+        } 
+      #endif
+      
+      break;
+    }
+    
+    case BUTTON_DOUBLE :
+    {
+      btn->Timer_Count++;     //时间记录 
+      if(btn->Timer_Count>=BUTTON_DOUBLE_TIME)
+      {
+        btn->Button_State = NONE_TRIGGER;
+        btn->Button_Last_State = NONE_TRIGGER;
+      }
+      #if SINGLE_AND_DOUBLE_TRIGGER
+      
+        if((btn->Timer_Count>=BUTTON_DOUBLE_TIME)&&(btn->Button_Last_State != BUTTON_DOWM))
+        {
+          btn->Timer_Count=0;
+          TRIGGER_CB(BUTTON_DOWM);    //单击
+          btn->Button_State = NONE_TRIGGER;
+          btn->Button_Last_State = BUTTON_DOWM;
+        }
+        
+      #endif
+
       break;
     }
     
     case NONE_TRIGGER :
-    {
-      btn->Timer_Count++;     //时间记录
       break;
-    }
     
     default :
       break;
