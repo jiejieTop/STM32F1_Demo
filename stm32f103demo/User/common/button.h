@@ -9,19 +9,23 @@
  只有连续检测到40ms状态不变才认为有效，包括弹起和按下两种事件
 */
 
-#define CONTINUOS_TRIGGER             1  //是否支持连续触发，连发的话就不要检测单双击与长按了	
+#define CONTINUOS_TRIGGER             0  //是否支持连续触发，连发的话就不要检测单双击与长按了	
 
 /* 是否支持单击&双击同时存在触发，如果选择开启宏定义的话，单双击都回调，只不过单击会延迟响应，
    因为必须判断单击之后是否触发了双击否则，延迟时间是双击间隔时间 BUTTON_DOUBLE_TIME。
    而如果不开启这个宏定义，建议工程中只存在单击/双击中的一个，否则，在双击响应的时候会触发一次单击，
    因为双击必须是有一次按下并且释放之后才产生的 */
-#define SINGLE_AND_DOUBLE_TRIGGER     0 
+#define SINGLE_AND_DOUBLE_TRIGGER     1 
 
+/* 是否支持长按释放才触发，如果打开这个宏定义，那么长按释放之后才触发单次长按，
+   否则在长按指定时间就一直触发长按，触发周期由 BUTTON_LONG_CYCLE 决定 */
+#define LONG_FREE_TRIGGER             0 
 
-#define BUTTON_DEBOUNCE_TIME 	2   //消抖时间      2*调用周期
-#define BUTTON_CYCLE          2	 //连按触发时间  2*调用周期  
-#define BUTTON_DOUBLE_TIME    15 	//双击间隔时间  20*调用周期  建议在200-600ms
-#define BUTTON_LONG_TIME 	    50		/* 持续1秒(50*调用周期)，认为长按事件 */
+#define BUTTON_DEBOUNCE_TIME 	  2   //消抖时间      (n-1)*调用周期
+#define BUTTON_CONTINUOS_CYCLE  1	  //连按触发周期时间  (n-1)*调用周期  
+#define BUTTON_LONG_CYCLE       1	  //长按触发周期时间  (n-1)*调用周期 
+#define BUTTON_DOUBLE_TIME      15 	//双击间隔时间  (n-1)*调用周期  建议在200-600ms
+#define BUTTON_LONG_TIME 	      50		/* 持续n秒((n-1)*调用周期 ms)，认为长按事件 */
 
 #define TRIGGER_CB(event)   \
         if(btn->CallBack_Function[event]) \
@@ -36,6 +40,7 @@ typedef enum {
   BUTTON_UP,
   BUTTON_DOUBLE,
   BUTTON_LONG,
+  BUTTON_LONG_FREE,
   BUTTON_CONTINUOS,
   BUTTON_CONTINUOS_FREE,
   BUTTON_ALL_RIGGER,
@@ -114,8 +119,9 @@ void Button_Delete(Button_t *btn);
   
 void Search_Button(void);     
                   
-void Get_Button_Event(Button_t *btn);
+void Get_Button_EventInfo(Button_t *btn);
+uint8_t Get_Button_Event(Button_t *btn);
 uint8_t Get_Button_State(Button_t *btn);
-
+void Button_Process_CallBack(void *btn);
                   
 #endif
