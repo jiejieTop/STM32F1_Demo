@@ -83,27 +83,7 @@ typedef struct button
 
 
 /* 供外部调用的函数声明 */
-/************************************************************
-  * @note    example
-uint8_t Read_TestBtn_Level(void)
-{
-  return GPIO_ReadInputDataBit(KEY1_GPIO_PORT,KEY1_GPIO_PIN);
-}
 
-void TestBtn_CallBack(void)
-{
-  printf("按键按下!\n");
-}
-
-  Button_Create("test_button",
-            &test_button, 
-            Read_TestBtn_Level, 
-            KEY_ON);
-  Button_Attach(&test_button,BUTTON_DOWM,TestBtn_CallBack);
-  Button_Attach(&test_button,BUTTON_LONG,TestBtn1_CallBack);
-  ......
-  
-  ***********************************************************/
 void Button_Create(const char *name,
                   Button_t *btn, 
                   uint8_t(*read_btn_level)(void),
