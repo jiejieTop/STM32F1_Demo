@@ -56,7 +56,7 @@ typedef enum
 {
 	FALSE = 0,		/* 假 */
 	TRUE = !FALSE	/* 真 */
-}ResultStatus;
+}bool;
 
 
 

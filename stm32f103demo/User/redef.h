@@ -126,8 +126,8 @@ typedef unsigned long       ubase_t;     /**< Nbit unsigned CPU related data typ
 #define ERR_NOK       ( -1 )
 #define ERR_NULL      ( -2 )
 #define ERR_UNUSE     ( -3 )
-    
-    
+
+
 #endif /* __REDEF_H */
 
 

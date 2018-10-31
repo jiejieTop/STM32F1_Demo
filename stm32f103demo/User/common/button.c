@@ -204,7 +204,7 @@ void Button_Cycle_Process(Button_t *btn)
     {
       if(btn->Button_Last_Level == btn->Button_Trigger_Level) //按键按下
       {
-        #if CONTINUOS_TRIGGER     //支持连续触发
+        #ifdef CONTINUOS_TRIGGER     //支持连续触发
 
         if(++(btn->Button_Cycle) >= BUTTON_CONTINUOS_CYCLE)
         {
@@ -220,7 +220,7 @@ void Button_Cycle_Process(Button_t *btn)
       
         if(++(btn->Long_Time) >= BUTTON_LONG_TIME)  //释放按键前更新触发事件为长按
         {
-          #if LONG_FREE_TRIGGER
+          #ifdef LONG_FREE_TRIGGER
           
           btn->Button_Trigger_Event = BUTTON_LONG; 
           
@@ -264,7 +264,7 @@ void Button_Cycle_Process(Button_t *btn)
             btn->Timer_Count=0;
             btn->Long_Time = 0;   //检测长按失败，清0
           
-          #if (SINGLE_AND_DOUBLE_TRIGGER == 0)
+          #ifndef SINGLE_AND_DOUBLE_TRIGGER 
             TRIGGER_CB(BUTTON_DOWM);    //单击
           #endif
             btn->Button_State = BUTTON_DOUBLE;
@@ -275,7 +275,7 @@ void Button_Cycle_Process(Button_t *btn)
       
       else if(btn->Button_Trigger_Event == BUTTON_LONG)
       {
-        #if LONG_FREE_TRIGGER
+        #ifdef LONG_FREE_TRIGGER
           TRIGGER_CB(BUTTON_LONG);    //长按
         #else
           TRIGGER_CB(BUTTON_LONG_FREE);    //长按释放
@@ -285,7 +285,7 @@ void Button_Cycle_Process(Button_t *btn)
         btn->Button_Last_State = BUTTON_LONG;
       } 
       
-      #if CONTINUOS_TRIGGER
+      #ifdef CONTINUOS_TRIGGER
         else if(btn->Button_Trigger_Event == BUTTON_CONTINUOS)  //连按
         {
           btn->Long_Time = 0;
@@ -306,7 +306,7 @@ void Button_Cycle_Process(Button_t *btn)
         btn->Button_State = NONE_TRIGGER;
         btn->Button_Last_State = NONE_TRIGGER;
       }
-      #if SINGLE_AND_DOUBLE_TRIGGER
+      #ifdef SINGLE_AND_DOUBLE_TRIGGER
       
         if((btn->Timer_Count>=BUTTON_DOUBLE_TIME)&&(btn->Button_Last_State != BUTTON_DOWM))
         {
