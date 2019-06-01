@@ -222,18 +222,18 @@ err_t Create_RingBuff(RingBuff_t* rb,
 {
 	if((rb == NULL)||(buffer == NULL)||(size == 0))
 	{
-		PRINT_ERR("data is null!");
+		PRINTF_ERR("data is null!");
 		return ERR_NULL;
 	}
 	
-	PRINT_DEBUG("ringbuff size is %d!",size);
+	PRINTF_DEBUG("ringbuff size is %d!",size);
 	/* 缓冲区大小必须为2^n字节,系统会强制转换,
 		 否则可能会导致指针访问非法地址。
 		 空间大小越大,强转时丢失内存越多 */
 	if(size&(size - 1))
 	{
 		size = roundup_pow_of_two(size);
-		PRINT_DEBUG("change ringbuff size is %d!",size);
+		PRINTF_DEBUG("change ringbuff size is %d!",size);
 	}
 
 	rb->buffer = buffer;
@@ -243,12 +243,12 @@ err_t Create_RingBuff(RingBuff_t* rb,
   /* 创建信号量不成功 */
   if(!create_mutex(rb->mutex))
   {
-    PRINT_ERR("create mutex fail!");
+    PRINTF_ERR("create mutex fail!");
     ASSERT(ASSERT_ERR);
     return ERR_NOK;
   }
 #endif
-	PRINT_DEBUG("create ringBuff ok!");
+	PRINTF_DEBUG("create ringBuff ok!");
 	return ERR_OK;
 }
 
@@ -266,7 +266,7 @@ err_t Delete_RingBuff(RingBuff_t *rb)
 {
 	if(rb == NULL)
 	{
-		PRINT_ERR("ringbuff is null!");
+		PRINTF_ERR("ringbuff is null!");
 		return ERR_NULL;
 	}
 	
@@ -276,7 +276,7 @@ err_t Delete_RingBuff(RingBuff_t *rb)
 #if USE_MUTEX	
   if(!deleta_mutex(rb->mutex))
   {
-    PRINT_DEBUG("deleta mutex is fail!");
+    PRINTF_DEBUG("deleta mutex is fail!");
     return ERR_NOK;
   }
 #endif
@@ -305,7 +305,7 @@ uint32_t Write_RingBuff(RingBuff_t *rb,
   /* 请求互斥量，成功才能进行ringbuff的访问 */
   if(!request_mutex(rb->mutex))
   {
-    PRINT_DEBUG("request mutex fail!");
+    PRINTF_DEBUG("request mutex fail!");
     return 0;
   }
   else  /* 获取互斥量成功 */
@@ -323,7 +323,7 @@ uint32_t Write_RingBuff(RingBuff_t *rb,
 
     rb->in += len;
     
-    PRINT_DEBUG("write ringBuff len is %d!",len);
+    PRINTF_DEBUG("write ringBuff len is %d!",len);
 #if USE_MUTEX
   }
   /* 释放互斥量 */
@@ -354,7 +354,7 @@ uint32_t Read_RingBuff(RingBuff_t *rb,
   /* 请求互斥量，成功才能进行ringbuff的访问 */
   if(!request_mutex(rb->mutex))
   {
-    PRINT_DEBUG("request mutex fail!");
+    PRINTF_DEBUG("request mutex fail!");
     return 0;
   }
   else
@@ -372,7 +372,7 @@ uint32_t Read_RingBuff(RingBuff_t *rb,
 
     rb->out += len;
     
-    PRINT_DEBUG("read ringBuff len is %d!",len);
+    PRINTF_DEBUG("read ringBuff len is %d!",len);
 #if USE_MUTEX
   }
   /* 释放互斥量 */
@@ -395,7 +395,7 @@ uint32_t CanRead_RingBuff(RingBuff_t *rb)
 {
 	if(NULL == rb)
 	{
-		PRINT_ERR("ringbuff is null!");
+		PRINTF_ERR("ringbuff is null!");
 		return 0;
 	}
 	if(rb->in == rb->out)
@@ -421,7 +421,7 @@ uint32_t CanWrite_RingBuff(RingBuff_t *rb)
 {
 	if(NULL == rb)
 	{
-		PRINT_ERR("ringbuff is null!");
+		PRINTF_ERR("ringbuff is null!");
 		return 0;
 	}
 
@@ -441,8 +441,8 @@ uint32_t CanWrite_RingBuff(RingBuff_t *rb)
 //                     res, 
 //                     datapack.data_length);
 //			
-//			PRINT_DEBUG("CanRead_RingBuff = %d!",CanRead_RingBuff(&ringbuff_handle));
-//			PRINT_DEBUG("CanWrite_RingBuff = %d!",CanWrite_RingBuff(&ringbuff_handle));
+//			PRINTF_DEBUG("CanRead_RingBuff = %d!",CanRead_RingBuff(&ringbuff_handle));
+//			PRINTF_DEBUG("CanWrite_RingBuff = %d!",CanWrite_RingBuff(&ringbuff_handle));
 //			
 //			Read_RingBuff(&ringbuff_handle,
 //                     res, 

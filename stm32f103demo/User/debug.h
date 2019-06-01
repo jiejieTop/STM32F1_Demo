@@ -12,27 +12,28 @@
 * @name Debug print 
 * @{
 */
-#define PRINT_DEBUG_ENABLE		0		/* 打印调试信息 */
-#define PRINT_ERR_ENABLE			1 	/* 打印错误信息 */
-#define PRINT_INFO_ENABLE			1		/* 打印个人信息 */
+#include "printf.h"
 
+#define PRINTF_DEBUG_ENABLE		1		/* 打印调试信息 */
+#define PRINTF_ERR_ENABLE			1 	/* 打印错误信息 */
+#define PRINTF_INFO_ENABLE			1		/* 打印个人信息 */
 
-#if PRINT_DEBUG_ENABLE
-#define PRINT_DEBUG(fmt, args...) 	 do{(printf("\n[DEBUG] >> "), printf(fmt, ##args));}while(0)     
+#if PRINTF_DEBUG_ENABLE
+#define PRINTF_DEBUG(fmt, args...) 	 do{(my_printf("\n[DEBUG] >> "), my_printf(fmt, ##args));}while(0)     
 #else
-#define PRINT_DEBUG(fmt, args...)	     
+#define PRINTF_DEBUG(fmt, args...)	     
 #endif
 
-#if PRINT_ERR_ENABLE
-#define PRINT_ERR(fmt, args...) 	 do{(printf("\n[ERR] >> "), printf(fmt, ##args));}while(0)     
+#if PRINTF_ERR_ENABLE
+#define PRINTF_ERR(fmt, args...) 	 do{(my_printf("\n[ERR] >> "), my_printf(fmt, ##args));}while(0)     
 #else
-#define PRINT_ERR(fmt, args...)	       
+#define PRINTF_ERR(fmt, args...)	       
 #endif
 
-#if PRINT_INFO_ENABLE
-#define PRINT_INFO(fmt, args...) 	 do{(printf("\n[INFO] >> "), printf(fmt, ##args));}while(0)     
+#if PRINTF_INFO_ENABLE
+#define PRINTF_INFO(fmt, args...) 	 do{(my_printf("\n[INFO] >> "), my_printf(fmt, ##args));}while(0)     
 #else
-#define PRINT_INFO(fmt, args...)	       
+#define PRINTF_INFO(fmt, args...)	       
 #endif
 
 /**@} */

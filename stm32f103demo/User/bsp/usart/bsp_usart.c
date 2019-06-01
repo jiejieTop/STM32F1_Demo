@@ -22,6 +22,7 @@ static void USARTx_DMA_Rx_Config(void);
 #if USE_USART_DMA_TX
 static void USARTx_DMA_Tx_Config(void);
 #endif
+
 /**
   ******************************************************************
 														变量声明
@@ -297,6 +298,18 @@ int fputc(int ch, FILE *f)
 		while (USART_GetFlagStatus(DEBUG_USARTx, USART_FLAG_TXE) == RESET);		
 	
 		return (ch);
+}
+
+
+int my_putchar(int c)  
+{
+/* 发送一个字节数据到串口 */
+		USART_SendData(DEBUG_USARTx, (uint8_t) c);
+		
+		/* 等待发送完毕 */
+		while (USART_GetFlagStatus(DEBUG_USARTx, USART_FLAG_TXE) == RESET);		
+	
+		return (c);
 }
 
 ///重定向c库函数scanf到串口，重写向后可使用scanf、getchar等函数

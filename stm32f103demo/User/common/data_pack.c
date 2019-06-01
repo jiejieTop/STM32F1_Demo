@@ -74,7 +74,7 @@ int32_t Send_DataPack(void *buff,
 	/* buff 无效	*/
 	if(NULL == buff)
 	{
-		PRINT_ERR("data Is Null \n");
+		PRINTF_ERR("data Is Null \n");
 		ASSERT(ASSERT_ERR);
 		return -1;
 	}
@@ -119,7 +119,7 @@ int32_t Send_DataPack(void *buff,
 	res = Usart_Send_Data(Usart_Tx_Buf,(pTxBuf - Usart_Tx_Buf));
 	if(res != ERR_OK)
 	{
-		PRINT_ERR("uart write error %d \n", res);
+		PRINTF_ERR("uart write error %d \n", res);
 		ASSERT(ASSERT_ERR);
 		return res;
 	}
@@ -159,7 +159,7 @@ err_t Usart_Send_Data(uint8_t *buf, uint16_t len)
 	/* 判断 buff 非空 */
 	if((NULL == buf)||(len == 0))
 	{
-    PRINT_ERR("send data is null!");
+    PRINTF_ERR("send data is null!");
 		return ERR_NULL;
 	}
 	/* 循环发送，一个字节 */
@@ -167,7 +167,7 @@ err_t Usart_Send_Data(uint8_t *buf, uint16_t len)
 	{
 		Usart_SendByte(DEBUG_USARTx,buf[i]);
 	}
-  PRINT_DEBUG("send data length  is %d!",len);
+  PRINTF_DEBUG("send data length  is %d!",len);
 	return ERR_OK;
 }  
 
@@ -198,7 +198,7 @@ void Receive_DataPack(void)
   /* 获取数据长度 */
   Usart_Rx_Sta = buff_length;
 
-	PRINT_DEBUG("buff_length = %d\n ",buff_length);
+	PRINTF_DEBUG("buff_length = %d\n ",buff_length);
   
 	/* 清DMA标志位 */
 	DMA_ClearFlag( DMA1_FLAG_TC5 );          
@@ -260,8 +260,8 @@ void Receive_DataPack(void)
           Usart_Rx_Buf[Usart_Rx_Sta&0XFF]=res ;
           Usart_Rx_Sta++;
           Usart_Rx_Sta|=0x8000;		/* 接收完成了 */ 
-          PRINT_DEBUG("receive ok!");
-          PRINT_DEBUG("buff_length = %d",Usart_Rx_Sta&0XFF);
+          PRINTF_DEBUG("receive ok!");
+          PRINTF_DEBUG("buff_length = %d",Usart_Rx_Sta&0XFF);
         }
 			}
 		}
@@ -276,7 +276,7 @@ void Receive_DataPack(void)
 			else/* 接收错误 */
 			{
 				Usart_Rx_Sta = 0;
-				PRINT_ERR("receive fail!");
+				PRINTF_ERR("receive fail!");
 			}		 
 		}
 	} 
@@ -302,7 +302,7 @@ err_t DataPack_Process(uint8_t* buff,DataPack_t* datapack)
   
   if((NULL == buff)||(NULL == datapack))
   {
-    PRINT_ERR("buff or len is NULL\n");
+    PRINTF_ERR("buff or len is NULL\n");
 		ASSERT(ASSERT_ERR);
     return ERR_NULL;
   }
@@ -315,7 +315,7 @@ err_t DataPack_Process(uint8_t* buff,DataPack_t* datapack)
     Usart_Rx_Sta = 0;
     if(data_len < 4)
     {
-      PRINT_ERR("datapack is mar!");
+      PRINTF_ERR("datapack is mar!");
       return ERR_UNUSE;
     }
     else
@@ -324,24 +324,24 @@ err_t DataPack_Process(uint8_t* buff,DataPack_t* datapack)
     }
 #if USE_DATA_CRC
     check_data_len = data_len - 8;
-		PRINT_DEBUG("check_data_len = %d",check_data_len);
+		PRINTF_DEBUG("check_data_len = %d",check_data_len);
 #else
     check_data_len = data_len - 4;
-		PRINT_DEBUG("check_data_len = %d",check_data_len);
+		PRINTF_DEBUG("check_data_len = %d",check_data_len);
 #endif
     /* 校验数据包是否完整 */
     if(check_data_len == datapack->data_length)
     {
       memcpy(buff,pbuff+3,datapack->data_length);
 			memset(Usart_Rx_Buf,0,data_len);
-			PRINT_DEBUG("data_length = %d",datapack->data_length);
-			PRINT_DEBUG("data = %s",buff);
-			PRINT_DEBUG("data handle ok！");
+			PRINTF_DEBUG("data_length = %d",datapack->data_length);
+			PRINTF_DEBUG("data = %s",buff);
+			PRINTF_DEBUG("data handle ok！");
     }
     else
     {
-			PRINT_DEBUG("data_length = %d",datapack->data_length);
-			PRINT_ERR("data length is not equal!");
+			PRINTF_DEBUG("data_length = %d",datapack->data_length);
+			PRINTF_ERR("data length is not equal!");
 			memset(Usart_Rx_Buf,0,data_len);
       buff = NULL;
       datapack->data_length = 0;

@@ -339,7 +339,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F10X_HD, USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\Libraries\CMSIS;..\..\User;..\..\Libraries\FWlib\inc;..\..\User\bsp</IncludePath>
+              <IncludePath>..\..\Libraries\CMSIS;..\..\User;..\..\Libraries\FWlib\inc;..\..\User\bsp;..\..\User\common</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -637,6 +637,11 @@
               <FileName>PID_Control.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\common\PID_Control.c</FilePath>
+            </File>
+            <File>
+              <FileName>printf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\common\printf.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -36,51 +36,51 @@ static void BSP_Init(void);
 
 void Btn1_Dowm_CallBack(void *btn)
 {
-  PRINT_INFO("Button1 单击!");
+  PRINTF_INFO("Button1 单击!");
 }
 
 void Btn1_Double_CallBack(void *btn)
 {
-  PRINT_INFO("Button1 双击!");
+  PRINTF_INFO("Button1 双击!");
 }
 
 void Btn1_Long_CallBack(void *btn)
 {
-  PRINT_INFO("Button1 长按!");
+  PRINTF_INFO("Button1 长按!");
 }
 
 void Btn1_Continuos_CallBack(void *btn)
 {
-  PRINT_INFO("Button1 连按!");
+  PRINTF_INFO("Button1 连按!");
 }
 void Btn1_ContinuosFree_CallBack(void *btn)
 {
-  PRINT_INFO("Button1 连按释放!");
+  PRINTF_INFO("Button1 连按释放!");
 }
 
 
 void Btn2_Dowm_CallBack(void *btn)
 {
-  PRINT_INFO("Button2 单击!");
+  PRINTF_INFO("Button2 单击!");
 }
 
 void Btn2_Double_CallBack(void *btn)
 {
-  PRINT_INFO("Button2 双击!");
+  PRINTF_INFO("Button2 双击!");
 }
 
 void Btn2_Long_CallBack(void *btn)
 {
-  PRINT_INFO("Button2 长按!");
+  PRINTF_INFO("Button2 长按!");
 }
 
 void Btn2_Continuos_CallBack(void *btn)
 {
-  PRINT_INFO("Button2 连按!");
+  PRINTF_INFO("Button2 连按!");
 }
 void Btn2_ContinuosFree_CallBack(void *btn)
 {
-  PRINT_INFO("Button2 连按释放!");
+  PRINTF_INFO("Button2 连按释放!");
 }
 
 /**
@@ -166,7 +166,7 @@ static void BSP_Init(void)
 	CRC_Config();
 	
 	/* 打印信息 */
-	PRINT_INFO("welcome to learn jiejie stm32 library!\n");
+	PRINTF_INFO("welcome to learn jiejie stm32 library!\n");
 	
 }
 

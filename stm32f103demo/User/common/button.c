@@ -45,7 +45,7 @@ void Button_Create(const char *name,
 {
   if( btn == NULL)
   {
-    PRINT_ERR("struct button is null!");
+    PRINTF_ERR("struct button is null!");
     ASSERT(ASSERT_ERR);
   }
   
@@ -62,7 +62,7 @@ void Button_Create(const char *name,
   btn->Button_Last_Level = btn->Read_Button_Level(); //按键当前电平
   btn->Debounce_Time = 0;
   
-  PRINT_DEBUG("button create success!");
+  PRINTF_DEBUG("button create success!");
   
   Add_Button(btn);          //创建的时候添加到单链表中
   
@@ -85,7 +85,7 @@ void Button_Attach(Button_t *btn,Button_Event btn_event,Button_CallBack btn_call
 {
   if( btn == NULL)
   {
-    PRINT_ERR("struct button is null!");
+    PRINTF_ERR("struct button is null!");
     ASSERT(ASSERT_ERR);       //断言
   }
   
@@ -143,7 +143,7 @@ void Get_Button_EventInfo(Button_t *btn)
   {
     if(btn->CallBack_Function[i] != 0)
     {
-      PRINT_INFO("Button_Event:%d",i);
+      PRINTF_INFO("Button_Event:%d",i);
     }      
   } 
 }
@@ -194,7 +194,7 @@ void Button_Cycle_Process(Button_t *btn)
       else if(btn->Button_State == BUTTON_DOWM)
       {
         btn->Button_State = BUTTON_UP;
-        PRINT_DEBUG("释放了按键");
+        PRINTF_DEBUG("释放了按键");
       }
   }
   
@@ -211,7 +211,7 @@ void Button_Cycle_Process(Button_t *btn)
           btn->Button_Cycle = 0;
           btn->Button_Trigger_Event = BUTTON_CONTINUOS; 
           TRIGGER_CB(BUTTON_CONTINUOS);    //连按
-          PRINT_DEBUG("连按");
+          PRINTF_DEBUG("连按");
         }
         
         #else
@@ -238,7 +238,7 @@ void Button_Cycle_Process(Button_t *btn)
           {
             btn->Long_Time = BUTTON_LONG_TIME;
           }
-          PRINT_DEBUG("长按");
+          PRINTF_DEBUG("长按");
         }
           
         #endif
@@ -255,7 +255,7 @@ void Button_Cycle_Process(Button_t *btn)
         {
           btn->Button_Trigger_Event = BUTTON_DOUBLE;
           TRIGGER_CB(BUTTON_DOUBLE);    
-          PRINT_DEBUG("双击");
+          PRINTF_DEBUG("双击");
           btn->Button_State = NONE_TRIGGER;
           btn->Button_Last_State = NONE_TRIGGER;
         }
@@ -360,7 +360,7 @@ void Search_Button(void)
   struct button* pass_btn;
   for(pass_btn = Head_Button; pass_btn != NULL; pass_btn = pass_btn->Next)
   {
-    PRINT_INFO("button node have %s",pass_btn->Name);
+    PRINTF_INFO("button node have %s",pass_btn->Name);
   }
 }
 
@@ -384,43 +384,43 @@ void Button_Process_CallBack(void *btn)
   {
     case BUTTON_DOWM:
     {
-      PRINT_INFO("添加你的按下触发的处理逻辑");
+      PRINTF_INFO("添加你的按下触发的处理逻辑");
       break;
     }
     
     case BUTTON_UP:
     {
-      PRINT_INFO("添加你的释放触发的处理逻辑");
+      PRINTF_INFO("添加你的释放触发的处理逻辑");
       break;
     }
     
     case BUTTON_DOUBLE:
     {
-      PRINT_INFO("添加你的双击触发的处理逻辑");
+      PRINTF_INFO("添加你的双击触发的处理逻辑");
       break;
     }
     
     case BUTTON_LONG:
     {
-      PRINT_INFO("添加你的长按触发的处理逻辑");
+      PRINTF_INFO("添加你的长按触发的处理逻辑");
       break;
     }
     
     case BUTTON_LONG_FREE:
     {
-      PRINT_INFO("添加你的长按释放触发的处理逻辑");
+      PRINTF_INFO("添加你的长按释放触发的处理逻辑");
       break;
     }
     
     case BUTTON_CONTINUOS:
     {
-      PRINT_INFO("添加你的连续触发的处理逻辑");
+      PRINTF_INFO("添加你的连续触发的处理逻辑");
       break;
     }
     
     case BUTTON_CONTINUOS_FREE:
     {
-      PRINT_INFO("添加你的连续触发释放的处理逻辑");
+      PRINTF_INFO("添加你的连续触发释放的处理逻辑");
       break;
     }
       
@@ -434,7 +434,7 @@ void Button_Process_CallBack(void *btn)
 static void Print_Btn_Info(Button_t* btn)
 {
   
-  PRINT_INFO("button struct information:\n\
+  PRINTF_INFO("button struct information:\n\
               btn->Name:%s \n\
               btn->Button_State:%d \n\
               btn->Button_Trigger_Event:%d \n\
@@ -512,36 +512,36 @@ static void Add_Button(Button_t* btn)
 
 //void Btn1_Dowm_CallBack(void *btn)
 //{
-//  PRINT_INFO("Button1 单击!");
+//  PRINTF_INFO("Button1 单击!");
 //}
 
 //void Btn1_Double_CallBack(void *btn)
 //{
-//  PRINT_INFO("Button1 双击!");
+//  PRINTF_INFO("Button1 双击!");
 //}
 
 //void Btn1_Long_CallBack(void *btn)
 //{
-//  PRINT_INFO("Button1 长按!");
+//  PRINTF_INFO("Button1 长按!");
 //  
 //  Button_Delete(&Button2);
-//  PRINT_INFO("删除Button1");
+//  PRINTF_INFO("删除Button1");
 //  Search_Button();
 //}
 
 //void Btn2_Dowm_CallBack(void *btn)
 //{
-//  PRINT_INFO("Button2 单击!");
+//  PRINTF_INFO("Button2 单击!");
 //}
 
 //void Btn2_Double_CallBack(void *btn)
 //{
-//  PRINT_INFO("Button2 双击!");
+//  PRINTF_INFO("Button2 双击!");
 //}
 
 //void Btn2_Long_CallBack(void *btn)
 //{
-//  PRINT_INFO("Button2 长按!");
+//  PRINTF_INFO("Button2 长按!");
 //}
 
 
@@ -558,7 +558,7 @@ static void Add_Button(Button_t* btn)
 
 //	BSP_Init();
 //  
-////  PRINT_DEBUG("当前电平：%d",Key_Scan(KEY1_GPIO_PORT,KEY1_GPIO_PIN));
+////  PRINTF_DEBUG("当前电平：%d",Key_Scan(KEY1_GPIO_PORT,KEY1_GPIO_PIN));
 //  
 //  Button_Create("Button1",
 //                &Button1, 
@@ -621,7 +621,7 @@ static void Add_Button(Button_t* btn)
 //	CRC_Config();
 //	
 //	/* 打印信息 */
-//	PRINT_INFO("welcome to learn jiejie stm32 library!\n");
+//	PRINTF_INFO("welcome to learn jiejie stm32 library!\n");
 //	
 //}
 
